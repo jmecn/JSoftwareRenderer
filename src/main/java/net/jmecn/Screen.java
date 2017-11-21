@@ -1,6 +1,7 @@
 package net.jmecn;
 
 import java.awt.Canvas;
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Toolkit;
@@ -97,10 +98,14 @@ public class Screen extends Canvas {
             displayComponents[i * 3 + 2] = components[i * 4];
         }
         
-        // 将BufferedImage绘制到缓冲区
         Graphics graphics = bufferStrategy.getDrawGraphics();
+        
+        // 将BufferedImage绘制到缓冲区
         graphics.drawImage(displayImage, 0, 0, image.getWidth(), image.getHeight(), null);
         
+        // 显示帧率
+        graphics.setColor(Color.WHITE);
+        graphics.drawString("FPS:" + fps, 2, 16);
         
         graphics.dispose();
         

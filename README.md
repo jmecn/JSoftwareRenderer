@@ -2,8 +2,7 @@
 
 ==
 
-如何开始用 C++ 写一个光栅化渲染器？ - Milo Yip的回答 - 知乎
-https://www.zhihu.com/question/24786878/answer/29039253
+[如何开始用 C++ 写一个光栅化渲染器？ - Milo Yip的回答 - 知乎](https://www.zhihu.com/question/24786878/answer/29039253)
 
 首先，如果从学习角度出发，不必一开始完全根据现时GPU的架构及概念，来用软件复制一遍。现时的GPU主要是基于三角形光栅化及z-buffer。
 

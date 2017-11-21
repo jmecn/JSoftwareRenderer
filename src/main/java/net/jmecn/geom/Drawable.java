@@ -10,6 +10,6 @@ import net.jmecn.renderer.ImageRaster;
  */
 public interface Drawable {
 
-    public void draw(ImageRaster renderContext);
+    public void draw(ImageRaster imageRaster);
     
 }

@@ -17,7 +17,7 @@ public abstract class Application {
 
     protected int width;
     protected int height;
-    private String title;
+    protected String title;
     
     // 帧率（FPS）
     private int framePerSecond;
@@ -45,19 +45,13 @@ public abstract class Application {
         width = 800;
         height = 600;
         title = "JSoftwareRenderer";
-
-        // 初始化渲染器
-        renderer = new Renderer(width, height);
-        renderer.setBackgroundColor(ColorRGBA.BLACK);
         
         // 初始化渲染队列
         scene = new ArrayList<Drawable>();
 
-        // 创建画布
-        screen = new Screen(width, height, title);
-
         // 改变运行状态
         isRunning = true;
+        
         // 关闭固定帧率
         setFrameRate(0);
     }
@@ -72,6 +66,12 @@ public abstract class Application {
         long deltaTime;
         float delta;
 
+        // 创建画布
+        screen = new Screen(width, height, title);
+        // 创建渲染器
+        renderer = new Renderer(width, height);
+        renderer.setBackgroundColor(ColorRGBA.BLACK);
+        
         // 初始化
         initialize();
 
@@ -115,11 +115,6 @@ public abstract class Application {
     }
 
     /**
-     * 初始化
-     */
-    protected abstract void initialize();
-
-    /**
      * 绘制画面
      */
     protected void render(float delta) {
@@ -137,6 +132,12 @@ public abstract class Application {
         // 交换画布缓冲区，显示画面
         screen.swapBuffer(renderer.getRenderContext(), framePerSecond);
     }
+    
+    /**
+     * 初始化
+     */
+    protected abstract void initialize();
+
 
     /**
      * 更新逻辑
@@ -163,6 +164,24 @@ public abstract class Application {
             this.fixedFrameRate = true;
             this.fixedTime = 1000000000 / rate;
         }
+    }
+
+    /**
+     * 设置分辨率
+     * @param width
+     * @param height
+     */
+    public void setResolution(int width, int height) {
+        this.width = width;
+        this.height = height;
+    }
+
+    /**
+     * 设置标题
+     * @param title
+     */
+    public void setTitle(String title) {
+        this.title = title;
     }
 
     /**
