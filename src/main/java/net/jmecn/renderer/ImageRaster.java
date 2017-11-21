@@ -1,7 +1,5 @@
 package net.jmecn.renderer;
 
-import java.util.Arrays;
-
 import net.jmecn.math.ColorRGBA;
 
 /**
@@ -25,15 +23,16 @@ public class ImageRaster {
     /**
      * 纯色填充
      * 
-     * @param clearColor
+     * @param color
      */
     public void fill(ColorRGBA color) {
-        if (color.r == color.g && color.r == color.b) {
-            Arrays.fill(components, color.r);
-        } else {
-            int length = width * height;
-            for (int i = 0; i < length; i++) {
-                int index = i * 4;
+        int length = width * height;
+        for (int i = 0; i < length; i++) {
+            int index = i * 4;
+            
+            // 使用一个判断，避免无谓的赋值。
+            if (components[index] != color.r && components[index + 1] != color.g
+                    && components[index + 2] != color.b && components[index + 3] != color.a) {
                 components[index] = color.r;
                 components[index + 1] = color.g;
                 components[index + 2] = color.b;
@@ -80,38 +79,38 @@ public class ImageRaster {
         int w = x1 - x0;
         int h = y1 - y0;
 
-        int dx1 = w < 0 ? -1: (w > 0 ? 1 : 0);
-        int dy1 = h < 0 ? -1: (h > 0 ? 1 : 0);
+        int dx1 = w < 0 ? -1 : (w > 0 ? 1 : 0);
+        int dy1 = h < 0 ? -1 : (h > 0 ? 1 : 0);
 
-        int dx2 = w < 0 ? -1: (w > 0 ? 1 : 0);
+        int dx2 = w < 0 ? -1 : (w > 0 ? 1 : 0);
         int dy2 = 0;
 
         int fastStep = Math.abs(w);
         int slowStep = Math.abs(h);
-        if (fastStep <=slowStep) {
-               fastStep= Math.abs(h);
-               slowStep= Math.abs(w);
+        if (fastStep <= slowStep) {
+            fastStep = Math.abs(h);
+            slowStep = Math.abs(w);
 
-               dx2= 0;
-               dy2= h < 0 ? -1 : (h > 0 ? 1 : 0);
-        } 
-        int numerator = fastStep>> 1;
+            dx2 = 0;
+            dy2 = h < 0 ? -1 : (h > 0 ? 1 : 0);
+        }
+        int numerator = fastStep >> 1;
 
-        for (int i = 0; i <=fastStep; i++) {
-               drawPixel(x,y, color);
-               numerator+= slowStep;
-               if (numerator >=fastStep) {
-                     numerator-= fastStep;
-                     x+= dx1;
-                     y+= dy1;
-               }else {
-                     x+= dx2;
-                     y+= dy2;
-               }
-               drawPixel(x, y, color);
+        for (int i = 0; i <= fastStep; i++) {
+            drawPixel(x, y, color);
+            numerator += slowStep;
+            if (numerator >= fastStep) {
+                numerator -= fastStep;
+                x += dx1;
+                y += dy1;
+            } else {
+                x += dx2;
+                y += dy2;
+            }
+            drawPixel(x, y, color);
         }
     }
-    
+
     /**
      * 画三角形
      * 

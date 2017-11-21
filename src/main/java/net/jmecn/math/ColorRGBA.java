@@ -1,5 +1,12 @@
 package net.jmecn.math;
 
+/**
+ * 颜色类。
+ * 每种颜色有red、green、blue、alpha四个通道，每个通道使用1字节存储。
+ * 
+ * @author yanmaoyuan
+ *
+ */
 public class ColorRGBA {
 
     public byte r;

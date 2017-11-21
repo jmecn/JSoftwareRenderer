@@ -8,7 +8,7 @@ import net.jmecn.math.ColorRGBA;
 import net.jmecn.renderer.Renderer;
 
 /**
- * 程序运行入口
+ * 应用程序主类
  * 
  * @author yanmaoyuan
  *
@@ -18,9 +18,6 @@ public abstract class Application {
     protected int width;
     protected int height;
     protected String title;
-    
-    // 帧率（FPS）
-    private int framePerSecond;
 
     // 显示器
     private Screen screen;
@@ -37,6 +34,12 @@ public abstract class Application {
     // 固定帧率
     private boolean fixedFrameRate;
     private long fixedTime;
+    
+    // 帧率（FPS）
+    private int framePerSecond;
+    // FPS队列
+    private final static int QUEUE_LENGTH = 60;
+    private float[] fps = new float[QUEUE_LENGTH];
     
     /**
      * 构造方法
@@ -65,9 +68,10 @@ public abstract class Application {
         long previousTime = System.nanoTime();
         long deltaTime;
         float delta;
-
-        // 创建画布
+        
+        // 创建主窗口
         screen = new Screen(width, height, title);
+        
         // 创建渲染器
         renderer = new Renderer(width, height);
         renderer.setBackgroundColor(ColorRGBA.BLACK);
@@ -187,10 +191,6 @@ public abstract class Application {
     /**
      * 更新FPS
      */
-    // 缓存最近10帧的FPS
-    private static int QUEUE_LENGTH = 60;
-    private float[] fps = new float[QUEUE_LENGTH];
-
     private void updateFramePerSecond(float delta) {
         // 队列左移
         for (int i = 0; i < QUEUE_LENGTH - 1; i++) {
@@ -209,7 +209,7 @@ public abstract class Application {
             }
         }
 
-        // 求平均值，为最近10帧内的帧数。
+        // 求平均值
         framePerSecond = (int) (sum / count);
     }
 }
