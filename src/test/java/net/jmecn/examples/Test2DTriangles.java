@@ -16,7 +16,7 @@ public class Test2DTriangles extends Application {
 
     public static void main(String[] args) {
         Test2DTriangles app = new Test2DTriangles();
-        app.setResolution(1080, 720);
+        app.setResolution(720, 405);
         app.setTitle("2D Triangles");
         app.setFrameRate(120);
         app.start();

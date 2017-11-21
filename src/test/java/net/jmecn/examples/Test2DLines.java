@@ -16,7 +16,7 @@ public class Test2DLines extends Application {
 
     public static void main(String[] args) {
         Test2DLines app = new Test2DLines();
-        app.setResolution(1080, 720);
+        app.setResolution(720, 405);
         app.setTitle("2D Lines");
         app.setFrameRate(120);
         app.start();
