@@ -65,6 +65,8 @@ public class ImageRaster {
     /**
      * 画线
      * 
+     * http://tech-algorithm.com/articles/drawing-line-using-bresenham-algorithm/
+     * 
      * @param x0
      * @param y0
      * @param x1
