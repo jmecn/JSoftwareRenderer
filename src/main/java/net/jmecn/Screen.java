@@ -19,12 +19,13 @@ import net.jmecn.renderer.Image;
  * @author yanmaoyuan
  *
  */
-public class Screen extends Canvas {
+public class Screen {
     
-    private static final long serialVersionUID = 1L;
-
     // 主窗口
     private JFrame frame;
+    
+    // 画布
+    private Canvas canvas;
     
     // 用于显示的图像
     private BufferedImage displayImage;
@@ -34,28 +35,28 @@ public class Screen extends Canvas {
     private BufferStrategy bufferStrategy;
     
     public Screen(int width, int height, String title) {
+        canvas = new Canvas();
+        
         // 设置画布的尺寸
         Dimension size = new Dimension(width, height);
-        
-        this.setPreferredSize(size);
-        this.setMaximumSize(size);
-        this.setMinimumSize(size);
-        this.setFocusable(true);
+        canvas.setPreferredSize(size);
+        canvas.setMaximumSize(size);
+        canvas.setMinimumSize(size);
+        canvas.setFocusable(true);
 
         // 创建主窗口
         frame = new JFrame();
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.add(this);// 设置画布
         frame.setResizable(false);
         frame.setSize(width, height);
         frame.setTitle(title);
+        frame.add(canvas);// 设置画布
         frame.pack();
         frame.setVisible(true);
-        
         centerScreen();// 窗口居中
         
         // 焦点集中到画布上，响应用户输入。
-        this.requestFocus();
+        canvas.requestFocus();
         
         // 创建缓冲图像
         displayImage = new BufferedImage(width, height, BufferedImage.TYPE_3BYTE_BGR);
@@ -63,8 +64,8 @@ public class Screen extends Canvas {
         this.displayComponents = ((DataBufferByte)displayImage.getRaster().getDataBuffer()).getData();
         
         // 创建双缓冲
-        this.createBufferStrategy(2);
-        this.bufferStrategy = this.getBufferStrategy();
+        canvas.createBufferStrategy(2);
+        this.bufferStrategy = canvas.getBufferStrategy();
     }
 
     /**

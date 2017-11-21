@@ -29,9 +29,9 @@ public class Test2DLines extends Application {
     protected void initialize() {
         Random rand = new Random();
         /**
-         * 随机生成1000条线段
+         * 随机生成线段
          */
-        for(int i=0; i<1000; i++) {
+        for(int i=0; i<100; i++) {
             Line2D line = new Line2D();
             line.x0 = rand.nextInt(width);
             line.y0 = rand.nextInt(height);

@@ -111,4 +111,21 @@ public class ImageRaster {
                drawPixel(x, y, color);
         }
     }
+    
+    /**
+     * 画三角形
+     * 
+     * @param x0
+     * @param y0
+     * @param x1
+     * @param y1
+     * @param x2
+     * @param y2
+     * @param color
+     */
+    public void drawTriangle(int x0, int y0, int x1, int y1, int x2, int y2, ColorRGBA color) {
+        drawLine(x0, y0, x1, y1, color);
+        drawLine(x0, y0, x2, y2, color);
+        drawLine(x2, y2, x1, y1, color);
+    }
 }
