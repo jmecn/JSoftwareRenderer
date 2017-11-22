@@ -15,12 +15,15 @@ public class Triangle2D implements Drawable {
     public int x1, y1;
     public int x2, y2;
     public ColorRGBA color = ColorRGBA.RED;
+    public boolean isSolid = true;// 是否实心
     
     @Override
     public void draw(ImageRaster imageRaster) {
-        imageRaster.drawLine(x0, y0, x1, y1, color);
-        imageRaster.drawLine(x0, y0, x2, y2, color);
-        imageRaster.drawLine(x1, y1, x2, y2, color);
+        if (isSolid) {
+            imageRaster.fillTriangle(x0, y0, x1, y1, x2, y2, color);
+        } else {
+            imageRaster.drawTriangle(x0, y0, x1, y1, x2, y2, color);
+        }
     }
 
 }

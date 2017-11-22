@@ -41,7 +41,7 @@ public class Test2DTriangles extends Application {
             tri.x2 = rand.nextInt(width);
             tri.y2 = rand.nextInt(height);
             tri.color = new ColorRGBA(rand.nextInt(0x4FFFFFFF));
-            
+            tri.isSolid = rand.nextFloat() > 0.5f;
             // 添加到场景中
             scene.add(tri);
         }
