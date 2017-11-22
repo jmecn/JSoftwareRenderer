@@ -205,12 +205,12 @@ public class ImageRaster {
 
                 // 现在把窗口外面这个端点移到交点处，准备下一轮剪切测试。
                 if (outcodeOut == outcode0) {
-                    x0 = (int) x;
-                    y0 = (int) y;
+                    x0 = (int) Math.round( x );
+                    y0 = (int) Math.round( y );
                     outcode0 = computeOutCode(x0, y0);
                 } else {
-                    x1 = (int) x;
-                    y1 = (int) y;
+                    x1 = (int) Math.round( x );
+                    y1 = (int) Math.round( y );
                     outcode1 = computeOutCode(x1, y1);
                 }
             }
