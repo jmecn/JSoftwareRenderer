@@ -4,7 +4,7 @@ import net.jmecn.math.ColorRGBA;
 import net.jmecn.renderer.ImageRaster;
 
 /**
- * 代表个三角形。
+ * 代表一个三角形。
  * 
  * @author yanmaoyuan
  *

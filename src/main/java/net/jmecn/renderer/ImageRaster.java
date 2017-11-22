@@ -241,31 +241,6 @@ public class ImageRaster {
 
     /**
      * 画实心三角形
-     * 
-     * @param x0
-     * @param y0
-     * @param x0
-     * @param y0
-     * @param x1
-     * @param y1
-     * @param color
-     * @deprecated Use {@link #fillTriangle(int,int,int,int,int,int,ColorRGBA)}
-     *             instead
-     */
-    public void drawSolidTriangle(int x0, int y0, int x1, int y1, int x2, int y2, ColorRGBA color) {
-        fillTriangle(x0, y0, x1, y1, x2, y2, color);
-    }
-
-    /**
-     * 画实心三角形
-     * 
-     * @param x0
-     * @param y0
-     * @param x0
-     * @param y0
-     * @param x1
-     * @param y1
-     * @param color
      */
     public void fillTriangle(int x0, int y0, int x1, int y1, int x2, int y2, ColorRGBA color) {
         if (y0 == y1) {
@@ -366,14 +341,6 @@ public class ImageRaster {
 
     /**
      * 画平底实心三角形
-     * 
-     * @param x0
-     * @param y0
-     * @param x1
-     * @param y1
-     * @param x2
-     * @param y2
-     * @param color
      */
     private void fillBottomLineTriangle(int x0, int y0, int x1, int y1, int x2, int y2, ColorRGBA color) {
         for (int y = y0; y <= y1; y++) {
@@ -387,14 +354,6 @@ public class ImageRaster {
 
     /**
      * 画平顶实心三角形
-     * 
-     * @param x0
-     * @param y0
-     * @param x1
-     * @param y1
-     * @param x2
-     * @param y2
-     * @param color
      */
     private void fillTopLineTriangle(int x0, int y0, int x1, int y1, int x2, int y2, ColorRGBA color) {
         for (int y = y0; y <= y2; y++) {
