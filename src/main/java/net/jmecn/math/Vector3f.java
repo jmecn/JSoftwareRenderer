@@ -281,7 +281,48 @@ public class Vector3f {
     }
 
     /**
-     * 向量叉乘（外积）。
+     * 求两个向量之间的夹角（弧度制）
+     * 注意：参与运算的两个向量都应该是单位向量
+     * 
+     * @param v
+     * @return
+     */
+    public float angleBetween(Vector3f v) {
+        float dotProduct = x * v.x + y * v.y + z * v.z;
+        float angle = (float) Math.acos(dotProduct);
+        return angle;
+    }
+    
+    /**
+     * 向量投影
+     *
+     * @param v
+     * @return 返回一个新的向量，它平行于另一个向量。
+     */
+    public Vector3f project(Vector3f v){
+        float n = x * v.x + y * v.y + z * v.z; // A . B
+        float d = v.lengthSquared(); // |B|^2
+        float scalor = n / d;
+        return new Vector3f(v.x * scalor, v.y * scalor, v.z * scalor);
+    }
+
+    /**
+     * 向量投影
+     * @param v
+     * @return 返回一个新的向量，它平行于另一个向量。
+     */
+    public Vector3f projectLocal(Vector3f v){
+        float n = this.dot(v); // A . B
+        float d = v.lengthSquared(); // |B|^2
+        float scalor = n / d;
+        x = v.x * scalor;
+        y = v.y * scalor;
+        z = v.z * scalor;
+        return this;
+    }
+    
+    /**
+     * 向量叉乘（外积）
      * 
      * @param v
      * @return 返回一个新的向量，它垂直于当前两个向量。
@@ -291,6 +332,49 @@ public class Vector3f {
         float ry = z * v.x - x * v.z;
         float rz = x * v.y - y * v.x;
         return new Vector3f(rx, ry, rz);
+    }
+    
+    /**
+     * 向量叉乘（外积）
+     * 
+     * @param v
+     * @return 返回一个新的向量，它垂直于当前两个向量。
+     */
+    public Vector3f crossLocal(Vector3f v) {
+        float tempX = y * v.z - z * v.y;
+        float tempY = z * v.x - x * v.z;
+        z = x * v.y - y * v.x;
+        x = tempX;
+        y = tempY;
+        return this;
+    }
+    
+    /**
+     * 在当前向量与final向量之间线性插值。
+     * 
+     * this=(1-changeAmnt)*this + changeAmnt * finalVec
+     * @param finalVec 终向量
+     * @param changeAmnt 插值系数，取值范围为 0.0 - 1.0。
+     */
+    public Vector3f interpolateLocal(Vector3f finalVec, float changeAmnt) {
+        this.x=(1-changeAmnt)*this.x + changeAmnt*finalVec.x;
+        this.y=(1-changeAmnt)*this.y + changeAmnt*finalVec.y;
+        this.z=(1-changeAmnt)*this.z + changeAmnt*finalVec.z;
+        return this;
+    }
+
+    /**
+     * 在当开始向量与终向量之间线性插值。
+     * this=(1-changeAmnt)*beginVec + changeAmnt * finalVec
+     * @param beginVec 开始向量（changeAmnt = 0）
+     * @param finalVec 终向量（changeAmnt = 1）
+     * @param changeAmnt 插值系数，取值范围为 0.0 - 1.0。
+     */
+    public Vector3f interpolateLocal(Vector3f beginVec,Vector3f finalVec, float changeAmnt) {
+        this.x=(1-changeAmnt)*beginVec.x + changeAmnt*finalVec.x;
+        this.y=(1-changeAmnt)*beginVec.y + changeAmnt*finalVec.y;
+        this.z=(1-changeAmnt)*beginVec.z + changeAmnt*finalVec.z;
+        return this;
     }
     
     /**
