@@ -12,9 +12,9 @@ public class Transform {
      */
     public static final Transform IDENTITY = new Transform();
     
-    private Vector3f scale;// 比例变换
-    private Quaternion rot;// 旋转变换
-    private Vector3f translation;// 平移变换
+    private Vector3f scale = new Vector3f(1, 1, 1);// 比例变换
+    private Quaternion rot = new Quaternion();// 旋转变换
+    private Vector3f translation = new Vector3f(0, 0, 0);// 平移变换
     
     /**
      * 初始化空间变换

@@ -23,6 +23,10 @@ public final class Vector4f {
         x = y = z = w = 0;
     }
     
+    public Vector4f(float value) {
+        x = y = z = w = value;
+    }
+    
     public Vector4f(float x, float y, float z, float w) {
         this.x = x;
         this.y = y;

@@ -52,8 +52,8 @@ public class ImageRaster {
             int index = i * 4;
 
             // 使用一个判断，避免无谓的赋值。
-            if (components[index] != color.r && components[index + 1] != color.g && components[index + 2] != color.b
-                    && components[index + 3] != color.a) {
+            if (components[index] != color.r || components[index + 1] != color.g || components[index + 2] != color.b
+                    || components[index + 3] != color.a) {
                 components[index] = color.r;
                 components[index + 1] = color.g;
                 components[index + 2] = color.b;
