@@ -374,20 +374,153 @@ public class Matrix3f {
     }
     
     /**
-     * 计算绕轴旋转矩阵。
-     * @param x
-     * @param y
-     * @param z
+     * 比例变换矩阵
+     * @param v
+     * @return
+     */
+    public Matrix3f fromScale(Vector3f v) {
+        m00 = v.x; m01 = 0;   m02 = 0;
+        m10 = 0;   m11 = v.y; m12 = 0;
+        m20 = 0;   m21 = 0;   m22 = v.z;
+        return this;
+    }
+    
+    /**
+     * 比例变换矩阵
+     * @param v
+     * @return
+     */
+    public Matrix3f fromScale(float x, float y, float z) {
+        m00 = x; m01 = 0; m02 = 0;
+        m10 = 0; m11 = y; m12 = 0;
+        m20 = 0; m21 = 0; m22 = z;
+        return this;
+    }
+    
+    /**
+     * 绕x轴旋转
      * @param angle
      * @return
      */
-    public Matrix3f initRotation(float x, float y, float z, float angle) {
+    public Matrix3f fromRotateX(float angle) {
         float sin = (float) Math.sin(angle);
         float cos = (float) Math.cos(angle);
+        
+        m00 = 1; m11 = 0;   m12 = 0;
+        m10 = 0; m11 = cos; m12 = -sin;
+        m20 = 0; m21 = sin; m22 = cos;
+        
+        return this;
+    }
+    
+    /**
+     * 绕y轴旋转
+     * @param angle
+     * @return
+     */
+    public Matrix3f fromRotateY(float angle) {
+        float sin = (float) Math.sin(angle);
+        float cos = (float) Math.cos(angle);
+        
+        m00 = cos;  m11 = 0; m12 = sin;
+        m10 = 0;    m11 = 1; m12 = 0;
+        m20 = -sin; m21 = 0; m22 = cos;
+        
+        return this;
+    }
+    
+    /**
+     * 绕z轴旋转
+     * @param angle
+     * @return
+     */
+    public Matrix3f fromRotateZ(float angle) {
+        float sin = (float) Math.sin(angle);
+        float cos = (float) Math.cos(angle);
+        
+        m00 = cos; m11 = -sin; m12 = 0;
+        m10 = sin; m11 = cos;  m12 = 0;
+        m20 = 0;   m21 = 0;    m22 = 1;
+        
+        return this;
+    }
+    
+    /**
+     * 欧拉角旋转
+     * @param xAngle
+     * @param yAngle
+     * @param zAngle
+     * @return
+     */
+    public Matrix3f fromRotate(float xAngle, float yAngle, float zAngle) {
+        // FIXME 这个计算方法的性能很差，可以直接根据矩阵乘法规则算出结果矩阵，然后化简。
+        Matrix3f rotateX = new Matrix3f().fromRotateX(xAngle);
+        Matrix3f rotateY = new Matrix3f().fromRotateX(yAngle);
+        Matrix3f rotateZ = new Matrix3f().fromRotateX(zAngle);
+        
+        Matrix3f result = rotateZ.mult(rotateY).mult(rotateX);
+        return result;
+    }
+    
+    /**
+     * 轴角对旋转矩阵
+     * @param v
+     * @param angle
+     * @return
+     */
+    public Matrix3f fromAxisAngle(Vector3f v, float angle) {
+        return fromAxisAngle(v.x, v.y, v.z, angle);
+    }
+    
+    /**
+     * 轴角对旋转矩阵。
+     * @param vx
+     * @param vy
+     * @param vz
+     * @param angle
+     * @return
+     */
+    public Matrix3f fromAxisAngle(float vx, float vy, float vz, float angle) {
+        zero();
+        
+        float length = vx * vx + vy * vy + vz * vz;
+        if (length == 0) {
+            return this;
+        }
+        
+        // 先把向量规范化
+        if (Math.abs(length - 1.0) > 0.0001) {
+            length = (float) (1.0 / Math.sqrt(length));
+            vx *= length;
+            vy *= length;
+            vz *= length;
+        }
+        
+        float sin = (float) Math.sin(angle);
+        float cos = (float) Math.cos(angle);
+        
+        // 节省5次减法运算
+        float _1_minus_cos = 1f - cos;
 
-        m00 = cos + x * x * (1 - cos);     m01 = x * y * (1 - cos) - z * sin; m02 = x * z * (1 - cos) + y * sin;
-        m10 = y * x * (1 - cos) + z * sin; m11 = cos + y * y * (1 - cos);     m12 = y * z * (1 - cos) - x * sin;
-        m20 = z * x * (1 - cos) - y * sin; m21 = z * y * (1 - cos) + x * sin; m22 = cos + z * z * (1 - cos);
+        // 节省3次乘法运算
+        float xSin = vx * sin;
+        float ySin = vy * sin;
+        float zSin = vz * sin;
+        
+        // 节省6次乘法运算
+        float xyM = vx * vy * _1_minus_cos;
+        float xzM = vx * vz * _1_minus_cos;
+        float yzM = vy * vz * _1_minus_cos;
+        
+        m00 = vx * vx * _1_minus_cos + cos;
+        m01 = xyM - zSin;
+        m02 = xzM + ySin;
+        m10 = xyM + zSin;
+        m11 = vy * vy * _1_minus_cos + cos;
+        m12 = yzM - xSin;
+        m20 = xzM - ySin;
+        m21 = yzM + xSin;
+        m22 = vz * vz * _1_minus_cos + cos;
 
         return this;
     }

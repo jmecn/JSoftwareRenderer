@@ -147,6 +147,20 @@ public class Vector3f {
     
     /**
      * 向量加法
+     * @param vec
+     * @param result
+     * @return
+     */
+    public Vector3f add(Vector3f vec, Vector3f result) {
+        if (result == null) result = new Vector3f();
+        result.x = x + vec.x;
+        result.y = y + vec.y;
+        result.z = z + vec.z;
+        return result;
+    }
+    
+    /**
+     * 向量加法
      * @param v
      * @return
      */
@@ -165,6 +179,20 @@ public class Vector3f {
      */
     public Vector3f subtract(Vector3f v) {
         return new Vector3f(x - v.x, y - v.y, z - v.z);
+    }
+    
+    /**
+     * 向量减法
+     * @return
+     */
+    public Vector3f subtract(Vector3f v, Vector3f result) {
+        if(result == null) {
+            result = new Vector3f();
+        }
+        result.x = x - v.x;
+        result.y = y - v.y;
+        result.z = z - v.z;
+        return result;
     }
     
     /**
@@ -213,6 +241,17 @@ public class Vector3f {
         return new Vector3f(x * v.x, y * v.y, z * v.z);
     }
 
+    /**
+     * 向量乘法
+     * @param vec
+     * @param store
+     * @return
+     */
+    public Vector3f mult(Vector3f vec, Vector3f store) {
+        if (store == null) store = new Vector3f();
+        return store.set(x * vec.x, y * vec.y, z * vec.z);
+    }
+    
     /**
      * 向量乘法
      * 
@@ -332,6 +371,22 @@ public class Vector3f {
         float ry = z * v.x - x * v.z;
         float rz = x * v.y - y * v.x;
         return new Vector3f(rx, ry, rz);
+    }
+    
+    /**
+     * 向量叉乘（外积）
+     * 
+     * @param v
+     * @param result
+     * @return
+     */
+    public Vector3f cross(Vector3f v, Vector3f result) {
+        if (result == null) result = new Vector3f();
+        float resX = ((y * v.x) - (z * v.y)); 
+        float resY = ((z * v.x) - (x * v.z));
+        float resZ = ((x * v.y) - (y * v.x));
+        result.set(resX, resY, resZ);
+        return result;
     }
     
     /**

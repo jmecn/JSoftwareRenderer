@@ -8,12 +8,10 @@ package net.jmecn.math;
  */
 public class Matrix4f {
     
-    float[][] m;
-    
-    public float m00, m01, m02, m03;
-    public float m10, m11, m12, m13;
-    public float m20, m21, m22, m23;
-    public float m30, m31, m32, m33;
+    protected float m00, m01, m02, m03;
+    protected float m10, m11, m12, m13;
+    protected float m20, m21, m22, m23;
+    protected float m30, m31, m32, m33;
 
     /**
      * 零矩阵
@@ -577,21 +575,6 @@ public class Matrix4f {
     }
     
     /**
-     * 屏幕空间变换
-     * @param halfWidth
-     * @param halfHeight
-     * @return
-     */
-    public Matrix4f initScreenSpaceTransform(float halfWidth, float halfHeight) {
-        m[0][0] = halfWidth; m[0][1] = 0;           m[0][2] = 0; m[0][3] = halfWidth - 0.5f;
-        m[1][0] = 0;         m[1][1] = -halfHeight; m[1][2] = 0; m[1][3] = halfHeight - 0.5f;
-        m[2][0] = 0;         m[2][1] = 0;           m[2][2] = 1; m[2][3] = 0;
-        m[3][0] = 0;         m[3][1] = 0;           m[3][2] = 0; m[3][3] = 1;
-
-        return this;
-    }
-
-    /**
      * 4*4矩阵的第四列表示位移
      * @param x
      * @param y
@@ -599,66 +582,27 @@ public class Matrix4f {
      * @return
      */
     public Matrix4f initTranslation(float x, float y, float z) {
-        m[0][0] = 1; m[0][1] = 0; m[0][2] = 0; m[0][3] = x;
-        m[1][0] = 0; m[1][1] = 1; m[1][2] = 0; m[1][3] = y;
-        m[2][0] = 0; m[2][1] = 0; m[2][2] = 1; m[2][3] = z;
-        m[3][0] = 0; m[3][1] = 0; m[3][2] = 0; m[3][3] = 1;
+        m00 = 1; m01 = 0; m02 = 0; m03 = x;
+        m10 = 0; m11 = 1; m12 = 0; m13 = y;
+        m20 = 0; m21 = 0; m22 = 1; m23 = z;
+        m30 = 0; m31 = 0; m32 = 0; m33 = 1;
 
         return this;
     }
 
     /**
-     * 计算绕轴旋转矩阵。
-     * @param x
-     * @param y
-     * @param z
-     * @param angle
+     * 4*4矩阵的左上角3个Vector3f，表示缩放矩阵。
+     * @param v
      * @return
      */
-    public Matrix4f initRotation(float x, float y, float z, float angle) {
-        float sin = (float) Math.sin(angle);
-        float cos = (float) Math.cos(angle);
-
-        m[0][0] = cos + x * x * (1 - cos);     m[0][1] = x * y * (1 - cos) - z * sin; m[0][2] = x * z * (1 - cos) + y * sin; m[0][3] = 0;
-        m[1][0] = y * x * (1 - cos) + z * sin; m[1][1] = cos + y * y * (1 - cos);     m[1][2] = y * z * (1 - cos) - x * sin; m[1][3] = 0;
-        m[2][0] = z * x * (1 - cos) - y * sin; m[2][1] = z * y * (1 - cos) + x * sin; m[2][2] = cos + z * z * (1 - cos);     m[2][3] = 0;
-        m[3][0] = 0;                           m[3][1] = 0;                           m[3][2] = 0;                           m[3][3] = 1;
-
+    public Matrix4f fromScale(Vector3f v) {
+        m00 = v.x; m01 = 0;   m02 = 0;   m03 = 0;
+        m10 = 0;   m11 = v.y; m12 = 0;   m13 = 0;
+        m20 = 0;   m21 = 0;   m22 = v.z; m23 = 0;
+        m30 = 0;   m31 = 0;   m32 = 0;   m33 = 1;
         return this;
     }
-
-    /**
-     * 利用矩阵乘法来计算欧拉角旋转矩阵。
-     * @param x
-     * @param y
-     * @param z
-     * @return
-     */
-    public Matrix4f initRotation(float x, float y, float z) {
-        Matrix4f rx = new Matrix4f();
-        Matrix4f ry = new Matrix4f();
-        Matrix4f rz = new Matrix4f();
-
-        rz.m[0][0] = (float) Math.cos(z); rz.m[0][1] = -(float) Math.sin(z); rz.m[0][2] = 0;  rz.m[0][3] = 0;
-        rz.m[1][0] = (float) Math.sin(z); rz.m[1][1] = (float) Math.cos(z);  rz.m[1][2] = 0;  rz.m[1][3] = 0;
-        rz.m[2][0] = 0;                   rz.m[2][1] = 0;                    rz.m[2][2] = 1;  rz.m[2][3] = 0;
-        rz.m[3][0] = 0;                   rz.m[3][1] = 0;                    rz.m[3][2] = 0;  rz.m[3][3] = 1;
-
-        rx.m[0][0] = 1; rx.m[0][1] = 0;                   rx.m[0][2] = 0;                    rx.m[0][3] = 0;
-        rx.m[1][0] = 0; rx.m[1][1] = (float) Math.cos(x); rx.m[1][2] = -(float) Math.sin(x); rx.m[1][3] = 0;
-        rx.m[2][0] = 0; rx.m[2][1] = (float) Math.sin(x); rx.m[2][2] = (float) Math.cos(x);  rx.m[2][3] = 0;
-        rx.m[3][0] = 0; rx.m[3][1] = 0;                   rx.m[3][2] = 0;                    rx.m[3][3] = 1;
-
-        ry.m[0][0] = (float) Math.cos(y); ry.m[0][1] = 0; ry.m[0][2] = -(float) Math.sin(y); ry.m[0][3] = 0;
-        ry.m[1][0] = 0;                   ry.m[1][1] = 1; ry.m[1][2] = 0;                    ry.m[1][3] = 0;
-        ry.m[2][0] = (float) Math.sin(y); ry.m[2][1] = 0; ry.m[2][2] = (float) Math.cos(y);  ry.m[2][3] = 0;
-        ry.m[3][0] = 0;                   ry.m[3][1] = 0; ry.m[3][2] = 0;                    ry.m[3][3] = 1;
-
-        m = rz.mul(ry.mul(rx)).getM();
-
-        return this;
-    }
-
+    
     /**
      * 4*4矩阵的左上角3个Vector3f，表示缩放矩阵。
      * @param x
@@ -666,136 +610,289 @@ public class Matrix4f {
      * @param z
      * @return
      */
-    public Matrix4f initScale(float x, float y, float z) {
-        m[0][0] = x; m[0][1] = 0; m[0][2] = 0; m[0][3] = 0;
-        m[1][0] = 0; m[1][1] = y; m[1][2] = 0; m[1][3] = 0;
-        m[2][0] = 0; m[2][1] = 0; m[2][2] = z; m[2][3] = 0;
-        m[3][0] = 0; m[3][1] = 0; m[3][2] = 0; m[3][3] = 1;
-
+    public Matrix4f fromScale(float x, float y, float z) {
+        m00 = x; m01 = 0; m02 = 0; m03 = 0;
+        m10 = 0; m11 = y; m12 = 0; m13 = 0;
+        m20 = 0; m21 = 0; m22 = z; m23 = 0;
+        m30 = 0; m31 = 0; m32 = 0; m33 = 1;
+        return this;
+    }
+    
+    /**
+     * 绕x轴旋转
+     * @param angle
+     * @return
+     */
+    public Matrix4f fromRotateX(float angle) {
+        float sin = (float) Math.sin(angle);
+        float cos = (float) Math.cos(angle);
+        
+        m00 = 1; m11 = 0;   m12 = 0;
+        m10 = 0; m11 = cos; m12 = -sin;
+        m20 = 0; m21 = sin; m22 = cos;
+        
+        return this;
+    }
+    
+    /**
+     * 绕y轴旋转
+     * @param angle
+     * @return
+     */
+    public Matrix4f fromRotateY(float angle) {
+        float sin = (float) Math.sin(angle);
+        float cos = (float) Math.cos(angle);
+        
+        m00 = cos;  m11 = 0; m12 = sin;
+        m10 = 0;    m11 = 1; m12 = 0;
+        m20 = -sin; m21 = 0; m22 = cos;
+        
+        return this;
+    }
+    
+    /**
+     * 绕z轴旋转
+     * @param angle
+     * @return
+     */
+    public Matrix4f fromRotateZ(float angle) {
+        float sin = (float) Math.sin(angle);
+        float cos = (float) Math.cos(angle);
+        
+        m00 = cos; m11 = -sin; m12 = 0;
+        m10 = sin; m11 = cos;  m12 = 0;
+        m20 = 0;   m21 = 0;    m22 = 1;
+        
         return this;
     }
 
     /**
-     * 正交投影矩阵
-     * @param fovY
-     * @param aspectRatio
-     * @param near
-     * @param far
+     * 轴角对旋转矩阵
+     * @param v
+     * @param angle
      * @return
      */
-    public Matrix4f initPerspective(float fovY, float aspectRatio, float near, float far) {
-        float zoomY = (float) Math.tan(fovY / 2);
-        float zoomX = zoomY * aspectRatio;
-
-        m[0][0] = 1.0f / zoomX; m[0][1] = 0;            m[0][2] = 0;                           m[0][3] = 0;
-        m[1][0] = 0;            m[1][1] = 1.0f / zoomY; m[1][2] = 0;                           m[1][3] = 0;
-        m[2][0] = 0;            m[2][1] = 0;            m[2][2] = (far + near) / (far - near); m[2][3] = 2 * far * near / (near - far);
-        m[3][0] = 0;            m[3][1] = 0;            m[3][2] = 1;                           m[3][3] = 0;
-
-        return this;
+    public Matrix4f fromAxisAngle(Vector3f v, float angle) {
+        return fromAxisAngle(v.x, v.y, v.z, angle);
     }
-
+    
     /**
-     * 平行投影矩阵
-     * @param left
-     * @param right
-     * @param bottom
-     * @param top
-     * @param near
-     * @param far
+     * 轴角对旋转矩阵。
+     * @param vx
+     * @param vy
+     * @param vz
+     * @param angle
      * @return
      */
-    public Matrix4f initOrthographic(float left, float right, float bottom, float top, float near, float far) {
-        float width = right - left;
-        float height = top - bottom;
-        float depth = far - near;
-
-        m[0][0] = 2 / width; m[0][1] = 0;          m[0][2] = 0;          m[0][3] = -(right + left) / width;
-        m[1][0] = 0;         m[1][1] = 2 / height; m[1][2] = 0;          m[1][3] = -(top + bottom) / height;
-        m[2][0] = 0;         m[2][1] = 0;          m[2][2] = -2 / depth; m[2][3] = -(far + near) / depth;
-        m[3][0] = 0;         m[3][1] = 0;          m[3][2] = 0;          m[3][3] = 1;
-
-        return this;
-    }
-
-    /**
-     * 初始化旋转矩阵
-     * @param forward
-     * @param up
-     * @return
-     */
-    public Matrix4f initRotation(Vector3f forward, Vector3f up) {
-        Vector3f f = forward.normalize();
-
-        Vector3f r = up.normalize();
-        r = r.cross(f);
-
-        Vector3f u = f.cross(r);
-
-        return initRotation(f, u, r);
-    }
-
-    /**
-     * 初始化旋转矩阵
-     * @param forward
-     * @param up
-     * @param right
-     * @return
-     */
-    public Matrix4f initRotation(Vector3f forward, Vector3f up, Vector3f right) {
-        Vector3f f = forward;
-        Vector3f r = right;
-        Vector3f u = up;
-
-        m[0][0] = r.x; m[0][1] = r.y; m[0][2] = r.z; m[0][3] = 0;
-        m[1][0] = u.x; m[1][1] = u.y; m[1][2] = u.z; m[1][3] = 0;
-        m[2][0] = f.x; m[2][1] = f.y; m[2][2] = f.z; m[2][3] = 0;
-        m[3][0] = 0;   m[3][1] = 0;   m[3][2] = 0;   m[3][3] = 1;
-
-        return this;
-    }
-
-    /**
-     * 对象量进行线性变换
-     * @param r
-     * @return
-     */
-    public Vector3f transform(Vector3f r) {
-        return new Vector3f(m[0][0] * r.x + m[0][1] * r.y + m[0][2] * r.z + m[0][3],
-                m[1][0] * r.x + m[1][1] * r.y + m[1][2] * r.z + m[1][3],
-                m[2][0] * r.x + m[2][1] * r.y + m[2][2] * r.z + m[2][3]);
-    }
-
-    /**
-     * 矩阵乘法
-     * @param r
-     * @return
-     */
-    public Matrix4f mul(Matrix4f r) {
-        Matrix4f res = new Matrix4f();
-
-        for (int i = 0; i < 4; i++) {
-            for (int j = 0; j < 4; j++) {
-                res.set(i, j,
-                        m[i][0] * r.get(0, j) + m[i][1] * r.get(1, j) + m[i][2] * r.get(2, j) + m[i][3] * r.get(3, j));
-            }
+    public Matrix4f fromAxisAngle(float vx, float vy, float vz, float angle) {
+        zero();
+        m33 = 1;
+        
+        float length = vx * vx + vy * vy + vz * vz;
+        if (length == 0) {
+            return this;
         }
+        
+        // 先把向量规范化
+        if (Math.abs(length - 1.0) > 0.0001) {
+            length = (float) (1.0 / Math.sqrt(length));
+            vx *= length;
+            vy *= length;
+            vz *= length;
+        }
+        
+        float sin = (float) Math.sin(angle);
+        float cos = (float) Math.cos(angle);
+        
+        // 节省5次减法运算
+        float _1_minus_cos = 1f - cos;
 
-        return res;
+        // 节省3次乘法运算
+        float xSin = vx * sin;
+        float ySin = vy * sin;
+        float zSin = vz * sin;
+        
+        // 节省6次乘法运算
+        float xyM = vx * vy * _1_minus_cos;
+        float xzM = vx * vz * _1_minus_cos;
+        float yzM = vy * vz * _1_minus_cos;
+        
+        m00 = vx * vx * _1_minus_cos + cos;
+        m01 = xyM - zSin;
+        m02 = xzM + ySin;
+        m10 = xyM + zSin;
+        m11 = vy * vy * _1_minus_cos + cos;
+        m12 = yzM - xSin;
+        m20 = xzM - ySin;
+        m21 = yzM + xSin;
+        m22 = vz * vz * _1_minus_cos + cos;
+
+        return this;
+    }
+    
+    /**
+     * 获得平移变换向量
+     * @return
+     */
+    public Vector3f toTranslationVector() {
+        return new Vector3f(m03, m13, m23);
     }
 
-    public float[][] getM() {
-        float[][] res = new float[4][4];
-
-        for (int i = 0; i < 4; i++)
-            for (int j = 0; j < 4; j++)
-                res[i][j] = m[i][j];
-
-        return res;
+    /**
+     * 获得平移变换向量
+     * @param vector
+     */
+    public void toTranslationVector(Vector3f vector) {
+        vector.set(m03, m13, m23);
+    }
+    
+    /**
+     * 旋转矩阵转为四元数
+     * @return
+     */
+    public Quaternion toRotationQuat() {
+        Quaternion quat = new Quaternion();
+        quat.fromRotationMatrix(toRotationMatrix());
+        return quat;
     }
 
-    public void setM(float[][] m) {
-        this.m = m;
+    /**
+     * 旋转矩阵转为四元数
+     * @param q
+     */
+    public void toRotationQuat(Quaternion q) {
+        q.fromRotationMatrix(toRotationMatrix());
+    }
+
+    /**
+     * 获得旋转矩阵
+     * @return
+     */
+    public Matrix3f toRotationMatrix() {
+        return new Matrix3f(m00, m01, m02, m10, m11, m12, m20, m21, m22);
+    }
+
+    /**
+     * 获得旋转矩阵
+     * @param mat
+     */
+    public void toRotationMatrix(Matrix3f mat) {
+        mat.m00 = m00;
+        mat.m01 = m01;
+        mat.m02 = m02;
+        mat.m10 = m10;
+        mat.m11 = m11;
+        mat.m12 = m12;
+        mat.m20 = m20;
+        mat.m21 = m21;
+        mat.m22 = m22;
+    }
+    
+    /**
+     * 获得比例变换向量
+     * 
+     * @return
+     */
+    public Vector3f toScaleVector() {
+        Vector3f result = new Vector3f();
+        this.toScaleVector(result);
+        return result;
+    }
+
+    /**
+     * 设置比例变换向量
+     * 
+     * @param the
+     */
+    public void toScaleVector(Vector3f vector) {
+        float scaleX = (float) Math.sqrt(m00 * m00 + m10 * m10 + m20 * m20);
+        float scaleY = (float) Math.sqrt(m01 * m01 + m11 * m11 + m21 * m21);
+        float scaleZ = (float) Math.sqrt(m02 * m02 + m12 * m12 + m22 * m22);
+        vector.set(scaleX, scaleY, scaleZ);
+    }
+
+    /**
+     * 设置比例变换
+     * 
+     * @param x
+     * @param y
+     * @param z
+     */
+    public void setScale(float x, float y, float z) {
+        Vector3f tmp = new Vector3f();
+        
+        tmp.set(m00, m10, m20);
+        tmp.normalizeLocal().multLocal(x);
+        m00 = tmp.x;
+        m10 = tmp.y;
+        m20 = tmp.z;
+
+        tmp.set(m01, m11, m21);
+        tmp.normalizeLocal().multLocal(y);
+        m01 = tmp.x;
+        m11 = tmp.y;
+        m21 = tmp.z;
+
+        tmp.set(m02, m12, m22);
+        tmp.normalizeLocal().multLocal(z);
+        m02 = tmp.x;
+        m12 = tmp.y;
+        m22 = tmp.z;
+    }
+
+    /**
+     * 设置比例变换
+     * 
+     * @param scale
+     */
+    public void setScale(Vector3f scale) {
+        this.setScale(scale.x, scale.y, scale.z);
+    }
+
+    /**
+     * 设置平移变换
+     * 
+     * @param translation
+     */
+    public void setTranslation(float[] translation) {
+        if (translation.length != 3) {
+            throw new IllegalArgumentException("Translation size must be 3.");
+        }
+        m03 = translation[0];
+        m13 = translation[1];
+        m23 = translation[2];
+    }
+
+    /**
+     * 设置平移变换
+     * 
+     * @param x
+     * @param y
+     * @param z
+     */
+    public void setTranslation(float x, float y, float z) {
+        m03 = x;
+        m13 = y;
+        m23 = z;
+    }
+
+    /**
+     * 设置平移变换
+     *
+     * @param translation
+     */
+    public void setTranslation(Vector3f translation) {
+        m03 = translation.x;
+        m13 = translation.y;
+        m23 = translation.z;
+    }
+    
+    /**
+     * 设置旋转变换
+     * @param quat
+     */
+    public void setRotationQuaternion(Quaternion quat) {
+        quat.toRotationMatrix(this);
     }
     
     /**
