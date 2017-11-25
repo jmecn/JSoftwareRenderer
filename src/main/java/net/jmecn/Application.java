@@ -5,7 +5,9 @@ import java.util.List;
 
 import net.jmecn.geom.Drawable;
 import net.jmecn.math.ColorRGBA;
+import net.jmecn.renderer.Camera;
 import net.jmecn.renderer.Renderer;
+import net.jmecn.scene.Mesh;
 
 /**
  * 应用程序主类
@@ -25,8 +27,12 @@ public abstract class Application {
     // 渲染器
     private Renderer renderer;
 
+    // 摄像机
+    private Camera camera;
+    
     // 渲染队列
     protected List<Drawable> scene;
+    protected List<Mesh> meshes;
 
     // 运行状态
     private boolean isRunning;
@@ -51,7 +57,8 @@ public abstract class Application {
         
         // 初始化渲染队列
         scene = new ArrayList<Drawable>();
-
+        meshes = new ArrayList<Mesh>();
+        
         // 改变运行状态
         isRunning = true;
         
@@ -75,6 +82,9 @@ public abstract class Application {
         // 创建渲染器
         renderer = new Renderer(width, height);
         renderer.setBackgroundColor(ColorRGBA.BLACK);
+        
+        // 创建摄像机
+        camera = new Camera(width, height);
         
         // 初始化
         initialize();
@@ -126,13 +136,21 @@ public abstract class Application {
         renderer.clear();
 
         // 绘制场景
-        int len = scene.size();
+        int len = meshes.size();
+        if (len > 0) {
+            for(int i=0; i < len; i++) {
+                meshes.get(i).render(renderer.getImageRaster(), camera);
+            }
+        }
+        
+        // 绘制2D场景
+        len = scene.size();
         if (len > 0) {
             for (int i = 0; i < len; i++) {
                 scene.get(i).draw(renderer.getImageRaster());
             }
         }
-
+        
         // 交换画布缓冲区，显示画面
         screen.swapBuffer(renderer.getRenderContext(), framePerSecond);
     }
@@ -186,6 +204,10 @@ public abstract class Application {
      */
     public void setTitle(String title) {
         this.title = title;
+    }
+
+    public Camera getCamera() {
+        return camera;
     }
 
     /**
