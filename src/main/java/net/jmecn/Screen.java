@@ -33,6 +33,8 @@ public class Screen {
     private BufferedImage displayImage;
     private byte[] displayComponents;
     
+    private Input input;
+    
     public Screen(int width, int height, String title) {
         canvas = new Canvas();
         
@@ -43,6 +45,12 @@ public class Screen {
         canvas.setMinimumSize(size);
         canvas.setFocusable(true);
 
+        input = new Input();
+        canvas.addKeyListener(input);
+        canvas.addFocusListener(input);
+        canvas.addMouseListener(input);
+        canvas.addMouseMotionListener(input);
+        
         // 创建主窗口
         frame = new JFrame();
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -112,6 +120,14 @@ public class Screen {
         
         // 显示图像
         bufferStrategy.show();
+    }
+
+    /**
+     * 获得用户输入
+     * @return
+     */
+    public Input getInput() {
+        return input;
     }
 
 }

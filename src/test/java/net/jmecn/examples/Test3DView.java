@@ -10,10 +10,10 @@ import net.jmecn.scene.Mesh;
  * @author yanmaoyuan
  *
  */
-public class Test3DWorldViewMatrix extends Application {
+public class Test3DView extends Application {
 
     public static void main(String[] args) {
-        Test3DWorldViewMatrix app = new Test3DWorldViewMatrix();
+        Test3DView app = new Test3DView();
         app.setResolution(400, 300);
         app.setTitle("3D View");
         app.setFrameRate(60);
@@ -56,12 +56,11 @@ public class Test3DWorldViewMatrix extends Application {
         // 添加到场景中
         meshes.add(mesh);
         
-        // 调整摄像机
+        // 调整摄像机的位置
         Camera cam = getCamera();
-        
         cam.setLocation(new Vector3f(3, 4, 8));
         cam.setDirection(new Vector3f(-3, -4, -8).normalizeLocal());
-        cam.initViewMatrix();
+        cam.updateViewProjectionMatrix();
     }
 
     @Override

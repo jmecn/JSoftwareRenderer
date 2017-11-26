@@ -86,6 +86,8 @@ public abstract class Application {
         // 创建摄像机
         camera = new Camera(width, height);
         
+        CameraController controller = new CameraController(camera, screen.getInput());
+        
         // 初始化
         initialize();
 
@@ -115,6 +117,8 @@ public abstract class Application {
             // 更新FPS
             updateFramePerSecond(delta);
 
+            controller.update(delta);
+            
             // 更新逻辑
             update(delta);
             
