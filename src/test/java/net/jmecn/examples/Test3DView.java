@@ -6,7 +6,7 @@ import net.jmecn.renderer.Camera;
 import net.jmecn.scene.Mesh;
 
 /**
- * 测试世界变换矩阵
+ * 测试3D观察的效果
  * @author yanmaoyuan
  *
  */

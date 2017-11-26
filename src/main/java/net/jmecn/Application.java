@@ -86,6 +86,7 @@ public abstract class Application {
         // 创建摄像机
         camera = new Camera(width, height);
         
+        // 创建摄像机控制器
         CameraController controller = new CameraController(camera, screen.getInput());
         
         // 初始化

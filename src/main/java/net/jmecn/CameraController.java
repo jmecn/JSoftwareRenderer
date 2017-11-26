@@ -32,10 +32,12 @@ public class CameraController {
         boolean changed = false;
         step.set(0, 0, 0);
         
+        // 计算移动的方向
         forward.set(camera.getDirection());
         right.set(camera.getRightVector());
         up.set(camera.getUpVector());
         
+        // 计算移动的距离
         float movement = delta * moveSpeed;
         forward.multLocal(movement);
         right.multLocal(movement);
@@ -43,32 +45,33 @@ public class CameraController {
 
         // 前后平移
         if (input.getKey(KeyEvent.VK_W)) {
-            camera.getLocation().addLocal(forward);
+            step.addLocal(forward);
             changed = true;
         } else if (input.getKey(KeyEvent.VK_S)) {
-            camera.getLocation().subtractLocal(forward);
+            step.subtractLocal(forward);
             changed = true;
         }
         
         // 左右平移
         if (input.getKey(KeyEvent.VK_A)) {
-            camera.getLocation().subtractLocal(right);
+            step.subtractLocal(right);
             changed = true;
         } else if (input.getKey(KeyEvent.VK_D)) {
-            camera.getLocation().addLocal(right);
+            step.addLocal(right);
             changed = true;
         }
         
         // 上下平移
         if (input.getKey(KeyEvent.VK_Z)) {
-            camera.getLocation().subtractLocal(up);
+            step.subtractLocal(up);
             changed = true;
         } else if (input.getKey(KeyEvent.VK_Q)) {
-            camera.getLocation().addLocal(up);
+            step.addLocal(up);
             changed = true;
         }
         
         if (changed) {
+            camera.getLocation().addLocal(step);
             camera.updateViewProjectionMatrix();
         }
     }

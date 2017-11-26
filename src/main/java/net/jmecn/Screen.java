@@ -33,6 +33,7 @@ public class Screen {
     private BufferedImage displayImage;
     private byte[] displayComponents;
     
+    // 用户输入
     private Input input;
     
     public Screen(int width, int height, String title) {
@@ -47,9 +48,6 @@ public class Screen {
 
         input = new Input();
         canvas.addKeyListener(input);
-        canvas.addFocusListener(input);
-        canvas.addMouseListener(input);
-        canvas.addMouseMotionListener(input);
         
         // 创建主窗口
         frame = new JFrame();
