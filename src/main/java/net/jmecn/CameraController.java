@@ -17,8 +17,9 @@ public class CameraController {
     
     public float moveSpeed = 10f;
     
-    private Vector3f forward = new Vector3f(0, 0, 1);
-    private Vector3f right = new Vector3f(-1, 0, 0);
+    private Vector3f forward = new Vector3f();
+    private Vector3f right = new Vector3f();
+    private Vector3f up = new Vector3f();
     
     private Vector3f step = new Vector3f();
     
@@ -32,10 +33,13 @@ public class CameraController {
         step.set(0, 0, 0);
         
         forward.set(camera.getDirection());
-        forward.cross(Vector3f.UNIT_Y, right);
+        right.set(camera.getRightVector());
+        up.set(camera.getUpVector());
         
-        forward.multLocal(delta * moveSpeed);
-        right.multLocal(delta * moveSpeed);
+        float movement = delta * moveSpeed;
+        forward.multLocal(movement);
+        right.multLocal(movement);
+        up.multLocal(movement);
 
         // 前后平移
         if (input.getKey(KeyEvent.VK_W)) {
@@ -52,6 +56,15 @@ public class CameraController {
             changed = true;
         } else if (input.getKey(KeyEvent.VK_D)) {
             camera.getLocation().addLocal(right);
+            changed = true;
+        }
+        
+        // 上下平移
+        if (input.getKey(KeyEvent.VK_Z)) {
+            camera.getLocation().subtractLocal(up);
+            changed = true;
+        } else if (input.getKey(KeyEvent.VK_Q)) {
+            camera.getLocation().addLocal(up);
             changed = true;
         }
         

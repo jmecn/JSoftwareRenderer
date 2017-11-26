@@ -73,42 +73,103 @@ public class Camera {
         updateViewportMatrix();
     }
     
+    /**
+     * 获取位置
+     * @return
+     */
     public Vector3f getLocation() {
         return location;
     }
 
+    /**
+     * 设置观察位置
+     * @param location
+     */
     public void setLocation(Vector3f location) {
         this.location.set(location);
+
+        updateViewMatrix();
+        projectionMatrix.mult(viewMatrix, viewProjectionMatrix);
     }
 
+    /**
+     * 获取观察方向
+     * @return
+     */
     public Vector3f getDirection() {
         return direction;
     }
 
+    /**
+     * 设置观察方向
+     * @param direction
+     */
     public void setDirection(Vector3f direction) {
         this.direction.set(direction);
+        updateViewMatrix();
+        projectionMatrix.mult(viewMatrix, viewProjectionMatrix);
     }
 
+    /**
+     * 获取观察方向的正右方向量
+     * @return
+     */
+    public Vector3f getRightVector() {
+        return xAxis;
+    }
+    
+    /**
+     * 获取观察方向的正上方向量
+     * @return
+     */
+    public Vector3f getUpVector() {
+        return yAxis;
+    }
+    
+    /**
+     * 是否平行投影
+     * @return
+     */
     public boolean isParallel() {
         return parallel;
     }
 
+    /**
+     * 设置平行投影
+     * @param parallel
+     */
     public void setParallel(boolean parallel) {
         this.parallel = parallel;
     }
     
+    /**
+     * 获取观察变换矩阵
+     * @return
+     */
     public Matrix4f getViewMatrix() {
         return viewMatrix;
     }
     
+    /**
+     * 获取投影变换矩阵
+     * @return
+     */
     public Matrix4f getProjectionMatrix() {
         return projectionMatrix;
     }
-    
+
+    /**
+     * 获取观察投影变换矩阵
+     * @return
+     */
     public Matrix4f getViewProjectionMatrix() {
         return viewProjectionMatrix;
     }
 
+    /**
+     * 获得视口变换矩阵
+     * @return
+     */
     public Matrix4f getViewportMatrix() {
         return viewportMatrix;
     }
