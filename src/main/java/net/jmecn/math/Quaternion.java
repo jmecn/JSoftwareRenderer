@@ -128,6 +128,41 @@ public class Quaternion {
     }
 
     /**
+     * 欧拉角旋转（弧度制）
+     * @param xAngle
+     * @param yAngle
+     * @param zAngle
+     * @return
+     */
+    public Quaternion fromAngles(float xAngle, float yAngle, float zAngle) {
+        float angle;
+        float sinY, sinZ, sinX, cosY, cosZ, cosX;
+        angle = zAngle * 0.5f;
+        sinZ = (float)Math.sin(angle);
+        cosZ = (float)Math.cos(angle);
+        angle = yAngle * 0.5f;
+        sinY = (float)Math.sin(angle);
+        cosY = (float)Math.cos(angle);
+        angle = xAngle * 0.5f;
+        sinX = (float)Math.sin(angle);
+        cosX = (float)Math.cos(angle);
+
+        // variables used to reduce multiplication calls.
+        float cosYXcosZ = cosY * cosZ;
+        float sinYXsinZ = sinY * sinZ;
+        float cosYXsinZ = cosY * sinZ;
+        float sinYXcosZ = sinY * cosZ;
+
+        w = (cosYXcosZ * cosX - sinYXsinZ * sinX);
+        x = (cosYXcosZ * sinX + sinYXsinZ * cosX);
+        y = (sinYXcosZ * cosX + cosYXsinZ * sinX);
+        z = (cosYXsinZ * cosX - sinYXcosZ * sinX);
+
+        normalizeLocal();
+        return this;
+    }
+    
+    /**
      * 负四元数
      * 
      * @return

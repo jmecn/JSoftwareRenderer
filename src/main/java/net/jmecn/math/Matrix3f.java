@@ -455,8 +455,8 @@ public class Matrix3f {
     public Matrix3f fromRotate(float xAngle, float yAngle, float zAngle) {
         // FIXME 这个计算方法的性能很差，可以直接根据矩阵乘法规则算出结果矩阵，然后化简。
         Matrix3f rotateX = new Matrix3f().fromRotateX(xAngle);
-        Matrix3f rotateY = new Matrix3f().fromRotateX(yAngle);
-        Matrix3f rotateZ = new Matrix3f().fromRotateX(zAngle);
+        Matrix3f rotateY = new Matrix3f().fromRotateY(yAngle);
+        Matrix3f rotateZ = new Matrix3f().fromRotateZ(zAngle);
         
         Matrix3f result = rotateZ.mult(rotateY).mult(rotateX);
         return result;
@@ -523,5 +523,31 @@ public class Matrix3f {
         m22 = vz * vz * _1_minus_cos + cos;
 
         return this;
+    }
+    
+    /**
+     * 使用3个基底向量来初始化矩阵
+     * @param xAxis
+     * @param yAxis
+     * @param zAxis
+     * @return
+     */
+    public Matrix3f fromAxis(Vector3f xAxis, Vector3f yAxis, Vector3f zAxis) {
+        m00 = xAxis.x; m01 = yAxis.x; m02 = zAxis.x;
+        m10 = xAxis.y; m11 = yAxis.y; m12 = zAxis.y;
+        m20 = xAxis.z; m21 = yAxis.z; m22 = zAxis.z;
+        return this;
+    }
+    
+    /**
+     * 将矩阵的三个基底坐标保存到3个向量中。
+     * @param xAxis
+     * @param yAxis
+     * @param zAxis
+     */
+    public void toAxis(Vector3f xAxis, Vector3f yAxis, Vector3f zAxis) {
+        xAxis.set(m00, m10, m20);
+        yAxis.set(m01, m11, m21);
+        zAxis.set(m02, m12, m22);
     }
 }

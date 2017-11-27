@@ -1,6 +1,7 @@
 package net.jmecn.renderer;
 
 import net.jmecn.math.Matrix4f;
+import net.jmecn.math.Quaternion;
 import net.jmecn.math.Vector3f;
 
 /**
@@ -362,4 +363,94 @@ public class Camera {
         viewportMatrix.set(m00, m01, m02, m03, m10, m11, m12, m13, m20, m21, m22, m23, m30, m31, m32, m33);
     }
 
+    /**
+     * 使摄像机观察指定位置
+     * @param target
+     * @param up
+     */
+    public void lookAt(Vector3f target, Vector3f up) {
+        target.subtract(location, direction);
+        direction.normalizeLocal();
+        
+        this.up.set(up);
+        this.up.normalizeLocal();
+        
+        updateViewMatrix();
+        projectionMatrix.mult(viewMatrix, viewProjectionMatrix);
+    }
+    
+    /**
+     * 使摄像机观察指定位置
+     * @param location
+     * @param target
+     * @param up
+     */
+    public void lookAt(Vector3f location, Vector3f target, Vector3f up) {
+        this.location.set(location);
+        target.subtract(location, direction);
+        this.direction.normalizeLocal();
+        
+        this.up.set(up);
+        this.up.normalizeLocal();
+        
+        updateViewMatrix();
+        projectionMatrix.mult(viewMatrix, viewProjectionMatrix);
+    }
+    
+    /**
+     * 使摄像机观察指定方向
+     * @param direction
+     * @param up
+     */
+    public void lookAtDirection(Vector3f direction, Vector3f up) {
+        this.direction.set(direction);
+        this.direction.normalizeLocal();
+        
+        this.up.set(up);
+        this.up.normalizeLocal();
+        
+        updateViewMatrix();
+        projectionMatrix.mult(viewMatrix, viewProjectionMatrix);
+    }
+    
+    /**
+     * 使摄像机观察指定方向
+     * @param location
+     * @param direction
+     * @param up
+     */
+    public void lookAtDirection(Vector3f location, Vector3f direction, Vector3f up) {
+        this.location.set(location);
+        
+        this.direction.set(direction);
+        this.direction.normalizeLocal();
+        
+        this.up.set(up);
+        this.up.normalizeLocal();
+        
+        updateViewMatrix();
+        projectionMatrix.mult(viewMatrix, viewProjectionMatrix);
+    }
+    
+    /**
+     * 使摄像机按欧拉角旋转（弧度制）
+     * @param xAngle
+     * @param yAngle
+     * @param zAngle
+     */
+    public void rotate(float xAngle, float yAngle, float zAngle) {
+        // 计算旋转后的uvn系统
+        // 不能直接绕x、y、z轴旋转，而是应该绕uvn系统的三轴旋转。
+        //Quaternion rot = new Quaternion().fromAngles(xAngle, yAngle, zAngle);
+        
+        Quaternion rot = new Quaternion(uAxis, xAngle);
+        rot.multLocal(new Quaternion(vAxis, yAngle));
+        rot.multLocal(new Quaternion(nAxis, zAngle));
+        // 计算旋转后的视线方向
+        rot.multLocal(direction);
+        direction.normalizeLocal();
+        
+        updateViewMatrix();
+        projectionMatrix.mult(viewMatrix, viewProjectionMatrix);
+    }
 }
