@@ -81,7 +81,7 @@ public abstract class Application {
         
         // 创建渲染器
         renderer = new Renderer(width, height);
-        renderer.setBackgroundColor(ColorRGBA.BLACK);
+        renderer.setBackgroundColor(ColorRGBA.DARKGRAY);
         
         // 创建摄像机
         camera = new Camera(width, height);

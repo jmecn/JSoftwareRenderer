@@ -30,12 +30,10 @@ public class Renderer {
      */
     public Renderer(int width, int height) {
         image = new Image(width, height);
+        imageRaster = new RenderContext(image);
         
         // 计算视口变换矩阵
         updateViewportMatrix(width, height);
-        
-        imageRaster = new RenderContext(image);
-        imageRaster.setViewportMatrix(viewportMatrix);
     }
 
     /**
@@ -147,27 +145,27 @@ public class Renderer {
         // 遍历所有三角形
         for (int i = 0; i < indexes.length; i += 3) {
 
-            Vertex v1 = vertexes[indexes[i]];
-            Vertex v2 = vertexes[indexes[i+1]];
-            Vertex v3 = vertexes[indexes[i+2]];
+            Vertex v0 = vertexes[indexes[i]];
+            Vertex v1 = vertexes[indexes[i+1]];
+            Vertex v2 = vertexes[indexes[i+2]];
             
             // 在观察空间进行背面消隐
-            worldViewMatrix.mult(v1.position, a);
-            worldViewMatrix.mult(v2.position, b);
-            worldViewMatrix.mult(v3.position, c);
+            worldViewMatrix.mult(v0.position, a);
+            worldViewMatrix.mult(v1.position, b);
+            worldViewMatrix.mult(v2.position, c);
             
             if (cullBackFace(a, b, c))
                 continue;
 
             // 使用齐次坐标计算顶点。
+            vertexShader(v0);
             vertexShader(v1);
             vertexShader(v2);
-            vertexShader(v3);
 
             if (mesh.isWireframe()) {
-                imageRaster.drawTriangle(v1, v2, v3);
+                imageRaster.drawTriangle(v0, v1, v2);
             } else {
-                imageRaster.fillTriangle(v1, v2, v3);
+                imageRaster.fillTriangle(v0, v1, v2);
             }
         }
     }
@@ -197,6 +195,17 @@ public class Renderer {
     protected void vertexShader(Vertex vert) {
         // 模型-观察-透视 变换
         worldViewProjectionMatrix.mult(new Vector4f(vert.position, 1), vert.fragCoord);
+        vert.fragCoord.multLocal(1f / vert.fragCoord.w); // 透视除法
+        
+        // 把顶点位置修正到屏幕空间。
+        viewportMatrix.mult(vert.fragCoord, vert.fragCoord);
+        
+        // 设置顶点颜色
+        if (vert.color == null) {
+            vert.fragColor.set(1, 1, 1, 1);
+        } else {
+            vert.fragColor.set(vert.color);
+        }
     }
     
 }

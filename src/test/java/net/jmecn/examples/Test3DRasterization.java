@@ -17,7 +17,7 @@ public class Test3DRasterization extends Application {
         Test3DRasterization app = new Test3DRasterization();
         app.setResolution(800, 600);
         app.setTitle("3D View");
-        app.setFrameRate(60);
+        //app.setFrameRate(60);
         app.start();
     }
 
@@ -87,7 +87,7 @@ public class Test3DRasterization extends Application {
         }
         
         // 计算旋转：绕Z轴顺时针方向旋转
-        mesh.getTransform().getRotation().fromAxisAngle(Vector3f.UNIT_Y, -angle);
+        //mesh.getTransform().getRotation().fromAxisAngle(Vector3f.UNIT_Y, -angle);
     }
 
 }

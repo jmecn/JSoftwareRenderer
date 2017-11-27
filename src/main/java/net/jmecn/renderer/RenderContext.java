@@ -1,6 +1,5 @@
 package net.jmecn.renderer;
 
-import net.jmecn.math.Matrix4f;
 import net.jmecn.math.Vector4f;
 import net.jmecn.scene.Vertex;
 
@@ -8,19 +7,9 @@ public class RenderContext extends ImageRaster {
 
     protected float[] depthBuffer;
     
-    private Matrix4f viewportMatrix;
-    
     public RenderContext(Image image) {
         super(image);
         depthBuffer = new float[width * height];
-    }
-
-    /**
-     * 设置视口变换矩阵
-     * @param mat
-     */
-    public void setViewportMatrix(Matrix4f mat) {
-        this.viewportMatrix = mat;
     }
     
     /**
@@ -44,185 +33,154 @@ public class RenderContext extends ImageRaster {
     }
 
     public void drawTriangle(Vertex v0, Vertex v1, Vertex v2) {
-        fragmentShader(v0);
-        fragmentShader(v1);
-        fragmentShader(v2);
-        
-        drawLineBresenham(v0, v1, 0);
-        drawLineBresenham(v0, v2, 0);
-        drawLineBresenham(v1, v2, 0);
+        drawLineBresenham(v0, v1);
+        drawLineBresenham(v0, v2);
+        drawLineBresenham(v1, v2);
     }
     
     public void fillTriangle(Vertex v0, Vertex v1, Vertex v2) {
-        fragmentShader(v0);
-        fragmentShader(v1);
-        fragmentShader(v2);
+        // 按Y坐标把三个顶点从上到下冒泡排序
+        Vertex tmp;
+        if (v0.fragCoord.y > v1.fragCoord.y) {
+            tmp = v0;
+            v0 = v1;
+            v1 = tmp;
+        }
+        if (v1.fragCoord.y > v2.fragCoord.y) {
+            tmp = v1;
+            v1 = v2;
+            v2 = tmp;
+        }
+        if (v0.fragCoord.y > v1.fragCoord.y) {
+            tmp = v0;
+            v0 = v1;
+            v1 = tmp;
+        }
         
+        float x0 = v0.fragCoord.x;
         float y0 = v0.fragCoord.y;
+        float x1 = v1.fragCoord.x;
         float y1 = v1.fragCoord.y;
+        float x2 = v2.fragCoord.x;
         float y2 = v2.fragCoord.y;
         
-        if (y0 == y1) {
-            if (y2 <= y0) // 平底
-            {
-                fillBottomLineTriangle(v2, v0, v1);
-            } else // 平顶
-            {
-                fillTopLineTriangle(v0, v1, v2);
-            }
-        } else if (y0 == y2) {
-            if (y1 <= y0) // 平底
-            {
-                fillBottomLineTriangle(v1, v0, v2);
-            } else // 平顶
-            {
-                fillTopLineTriangle(v0, v2, v1);
-            }
-        } else if (y1 == y2) {
-            if (y0 <= y1) // 平底
-            {
-                fillBottomLineTriangle(v0, v1, v2);
-            } else // 平顶
-            {
-                fillTopLineTriangle(v1, v2, v0);
-            }
-        } else {
-            // 分割三角形
-            Vertex top = null;
-            Vertex middle = null;
-            Vertex bottom = null;
-            
-            if (y0 < y1 && y1 < y2)
-            {
-                top = v0;
-                middle = v1;
-                bottom = v2;
-            } else if (y0 < y2 && y2 < y1)
-            {
-                top = v0;
-                middle = v2;
-                bottom = v1;
-            } else if (y1 < y0 && y0 < y2)
-            {
-                top = v1;
-                middle = v0;
-                bottom = v2;
-            } else if (y1 < y2 && y2 < y0)
-            {
-                top = v1;
-                middle = v2;
-                bottom = v0;
-            } else if (y2 < y0 && y0 < y1)
-            {
-                top = v2;
-                middle = v0;
-                bottom = v1;
-            } else if (y2 < y1 && y1 < y0)
-            {
-                top = v2;
-                middle = v1;
-                bottom = v0;
-            }
-            
-            float changeAmnt = (middle.fragCoord.y - top.fragCoord.y) / (bottom.fragCoord.y - top.fragCoord.y);
+        if (y0 == y1) {// 平顶
+            fillTopLineTriangle(v0, v1, v2);
+        } else if (y1 == y2) {// 平底
+            fillBottomLineTriangle(v0, v1, v2);
+        } else {// 分割三角形
+            float t = (y1 - y0) / (y2 - y0);
             // 长边在ymiddle时的x，来决定长边是在左边还是右边
-            float middleX = (float)(changeAmnt * (bottom.fragCoord.x - top.fragCoord.x) + top.fragCoord.x + 0.5f);
+            float middleX = (float)(t * (x2 - x0) + x0);
             
             Vertex newVert = new Vertex();
-            newVert.interpolateLocal(top, bottom, changeAmnt);
+            newVert.interpolateLocal(v0, v2, t);
             
-            if (middleX <= middle.fragCoord.x) // 左三角形
-            {
+            if (middleX <= x1)  {// 左三角形
                 // 画平底
-                fillBottomLineTriangle(top, newVert, middle);
-
+                fillBottomLineTriangle(v0, newVert, v1);
                 // 画平顶
-                fillTopLineTriangle(newVert, middle, bottom);
-            } else // 右三角形
-            {
+                fillTopLineTriangle(newVert, v1, v2);
+            } else {// 右三角形
                 // 画平底
-                fillBottomLineTriangle(top, middle, newVert);
-
+                fillBottomLineTriangle(v0, v1, newVert);
                 // 画平顶
-                fillTopLineTriangle(middle, newVert, bottom);
+                fillTopLineTriangle(v1, newVert, v2);
             }
         }
     }
 
     /**
      * 画平底实心三角形
-     * 
-     * v1 v2 是底边
+     * @param v0 上顶点
+     * @param v1 底边左顶点
+     * @param v2 底边右顶点
      */
     private void fillBottomLineTriangle(Vertex v0, Vertex v1, Vertex v2) {
-        for (float y = v0.fragCoord.y; y <= v1.fragCoord.y; y++)
-        {
+        int y0 = (int) (v0.fragCoord.y + 0.5f);
+        int y2 = (int) (v2.fragCoord.y + 0.5f);
+        
+        // 左边线的斜率
+        float dyl = (v1.fragCoord.x - v0.fragCoord.x) / (v1.fragCoord.y - v0.fragCoord.y);
+        // 右边线的斜率
+        float dyr = (v2.fragCoord.x - v0.fragCoord.x) / (v2.fragCoord.y - v0.fragCoord.y);
+        
+        for (int y = y0; y <= y2; y++) {
             int yIndex = (int)(Math.round(y)); 
-            if (yIndex >= 0 && yIndex < this.height)
-            {
-                float xl = (y - v0.fragCoord.y) * (v1.fragCoord.x - v0.fragCoord.x) / (v1.fragCoord.y - v0.fragCoord.y) + v0.fragCoord.x + 0.5f;
-                float xr = (y - v0.fragCoord.y) * (v2.fragCoord.x - v0.fragCoord.x) / (v2.fragCoord.y - v0.fragCoord.y) + v0.fragCoord.x + 0.5f;
+            if (yIndex >= 0 && yIndex < this.height) {
+                float xl = (y - v0.fragCoord.y) * dyl + v0.fragCoord.x + 0.5f;
+                float xr = (y - v0.fragCoord.y) * dyr + v0.fragCoord.x + 0.5f;
 
                 float dy = y - v0.fragCoord.y;
                 float t = dy / (v1.fragCoord.y - v0.fragCoord.y);
                 //插值生成左右顶点
-                Vertex new1 = new Vertex();
-                new1.fragCoord.x = xl;
-                new1.fragCoord.y = y;
-                new1.interpolateLocal(v0, v1, t);
+                Vertex vl = new Vertex();
+                vl.fragCoord.x = xl;
+                vl.fragCoord.y = y;
+                vl.interpolateLocal(v0, v1, t);
                 //
-                Vertex new2 = new Vertex();
-                new2.fragCoord.x = xr;
-                new2.fragCoord.y = y;
-                new2.interpolateLocal(v0, v2, t);
+                Vertex vr = new Vertex();
+                vr.fragCoord.x = xr;
+                vr.fragCoord.y = y;
+                vr.interpolateLocal(v0, v2, t);
                 //扫描线填充
-                if(new1.fragCoord.x < new2.fragCoord.x)
-                {
-                    drawLineBresenham(new1, new2, yIndex);
-                }
-                else
-                {
-                    drawLineBresenham(new2, new1, yIndex);
-                }
+                drawScanline(vl, vr, y);
             }
         }
     }
 
     /**
      * 画平顶实心三角形
-     * v0 v1 是底边
+     * @param v0 顶边左顶点
+     * @param v1 顶边右顶点
+     * @param v2 下顶点
      */
     private void fillTopLineTriangle(Vertex v0, Vertex v1, Vertex v2) {
-        for (float y = v0.fragCoord.y; y <= v2.fragCoord.y; y++)
-        {
-            int yIndex = (int)(Math.round(y)); 
-            if (yIndex >= 0 && yIndex < this.height)
-            {
-                float xl = (y - v0.fragCoord.y) * (v2.fragCoord.x - v0.fragCoord.x) / (v2.fragCoord.y - v0.fragCoord.y) + v0.fragCoord.x + 0.5f;
-                float xr = (y - v1.fragCoord.y) * (v2.fragCoord.x - v1.fragCoord.x) / (v2.fragCoord.y - v1.fragCoord.y) + v1.fragCoord.x + 0.5f;
+        int y0 = (int) (v0.fragCoord.y + 0.5f);
+        int y2 = (int) (v2.fragCoord.y + 0.5f);
+
+        // 左边线的斜率
+        float dyl = (v2.fragCoord.x - v0.fragCoord.x) / (v2.fragCoord.y - v0.fragCoord.y);
+        // 右边线的斜率
+        float dyr = (v2.fragCoord.x - v1.fragCoord.x) / (v2.fragCoord.y - v1.fragCoord.y);
+        
+        for (int y = y0; y <= y2; y++) {
+            if (y >= 0 && y < this.height) {
+                float xl = (y - v0.fragCoord.y) * dyl + v0.fragCoord.x + 0.5f;
+                float xr = (y - v1.fragCoord.y) * dyr + v1.fragCoord.x + 0.5f;
 
                 float dy = y - v0.fragCoord.y;
                 float t = dy / (v2.fragCoord.y - v0.fragCoord.y);
                 //插值生成左右顶点
-                Vertex new1 = new Vertex();
-                new1.fragCoord.x = xl;
-                new1.fragCoord.y = y;
-                new1.interpolateLocal(v0, v2, t);
+                Vertex vl = new Vertex();
+                vl.interpolateLocal(v0, v2, t);
+                vl.fragCoord.x = xl;
+                vl.fragCoord.y = y;
                 //
-                Vertex new2 = new Vertex();
-                new2.fragCoord.x = xr;
-                new2.fragCoord.y = y;
-                new2.interpolateLocal(v1, v2, t);
+                Vertex vr = new Vertex();
+                vr.interpolateLocal(v1, v2, t);
+                vr.fragCoord.x = xr;
+                vr.fragCoord.y = y;
                 //扫描线填充
-                if (new1.fragCoord.x < new2.fragCoord.x)
-                {
-                    drawLineBresenham(new1, new2, yIndex);
-                }
-                else
-                {
-                    drawLineBresenham(new2, new1, yIndex);
-                }
+                drawScanline(vl, vr, y);
             }
+        }
+    }
+    
+    public void drawScanline(Vertex v0, Vertex v1, int yIndex) {
+        int x = (int) (v0.fragCoord.x + 0.5f);
+        int y = (int) (v0.fragCoord.y + 0.5f);
+        
+        int w = (int) (v1.fragCoord.x - v0.fragCoord.x);
+        
+        Vector4f c0 = v0.fragColor;
+        Vector4f c1 = v1.fragColor;
+        Vector4f color = new Vector4f();
+        
+        for (int i = 0; i <= w; i++) {
+            // 颜色线性插值
+            color.interpolateLocal(c0, c1, (float)i/(w-1));
+            drawPixel(x+i, y, color);
         }
     }
     
@@ -231,7 +189,7 @@ public class RenderContext extends ImageRaster {
      * 
      * @param yIndex 
      */
-    public void drawLineBresenham(Vertex v0, Vertex v1, int yIndex) {
+    public void drawLineBresenham(Vertex v0, Vertex v1) {
         int x = (int) v0.fragCoord.x;
         int y = (int) v0.fragCoord.y;
 
@@ -274,19 +232,6 @@ public class RenderContext extends ImageRaster {
                 y += dy2;
             }
             drawPixel(x, y, color);
-        }
-    }
-    
-    protected void fragmentShader(Vertex vert) {
-        // 把顶点位置修正到屏幕空间。
-        viewportMatrix.mult(vert.fragCoord, vert.fragCoord);
-        // 透视除法
-        vert.fragCoord.multLocal(1f / vert.fragCoord.w);
-        
-        if (vert.color == null) {
-            vert.fragColor.set(1, 1, 1, 1);
-        } else {
-            vert.fragColor.set(vert.color);
         }
     }
 }
