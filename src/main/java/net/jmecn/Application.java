@@ -141,15 +141,10 @@ public abstract class Application {
         renderer.clear();
 
         // 绘制场景
-        int len = meshes.size();
-        if (len > 0) {
-            for(int i=0; i < len; i++) {
-                meshes.get(i).render(renderer.getImageRaster(), camera);
-            }
-        }
+        renderer.render(meshes, camera);
         
         // 绘制2D场景
-        len = scene.size();
+        int len = scene.size();
         if (len > 0) {
             for (int i = 0; i < len; i++) {
                 scene.get(i).draw(renderer.getImageRaster());

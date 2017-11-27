@@ -10,9 +10,9 @@ import net.jmecn.math.ColorRGBA;
  */
 public class ImageRaster {
 
-    private int width;
-    private int height;
-    private byte[] components;
+    protected int width;
+    protected int height;
+    protected byte[] components;
 
     // Cohen-Sutherland算法的空间编码
     private final static int INSIDE = 0; // 0000

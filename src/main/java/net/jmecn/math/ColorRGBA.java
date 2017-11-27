@@ -25,6 +25,13 @@ public class ColorRGBA {
         r = g = b = a = (byte) 0xFF;
     }
 
+    public ColorRGBA(Vector4f c) {
+        r = (byte)(c.x * 0xFF);
+        g = (byte)(c.y * 0xFF);
+        b = (byte)(c.z * 0xFF);
+        a = (byte)(c.w * 0xFF);
+    }
+    
     public ColorRGBA(int color) {
         r = (byte) ((color >> 24) & 0xFF);
         g = (byte) ((color >> 16) & 0xFF);

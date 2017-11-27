@@ -69,31 +69,15 @@ public class Camera {
     private Matrix4f viewProjectionMatrix = new Matrix4f();
     
     /**
-     * 屏幕的宽度和高度
-     */
-    private int width;
-    private int height;
-    
-    /**
-     * 视口变换矩阵
-     */
-    private Matrix4f viewportMatrix = new Matrix4f();
-    
-    /**
      * 初始化摄像机
      * @param width
      * @param height
      */
     public Camera(int width, int height) {
-        this.width = width;
-        this.height = height;
         this.aspect = (float) width / height;// 屏幕宽高比
         
         // 计算观察-投影变换矩阵
         updateViewProjectionMatrix();
-        
-        // 计算屏幕空间变换矩阵
-        updateViewportMatrix();
     }
     
     /**
@@ -189,14 +173,6 @@ public class Camera {
         return viewProjectionMatrix;
     }
 
-    /**
-     * 获得视口变换矩阵
-     * @return
-     */
-    public Matrix4f getViewportMatrix() {
-        return viewportMatrix;
-    }
-    
     /**
      * 观察-投影 变换矩阵
      */
@@ -334,35 +310,6 @@ public class Camera {
         projectionMatrix.set(m00, m01, m02, m03, m10, m11, m12, m13, m20, m21, m22, m23, m30, m31, m32, m33);
     }
     
-    /**
-     * 视口变换矩阵
-     */
-    public void updateViewportMatrix(float xmin, float ymin, float xmax, float ymax, float near, float far) {
-        // 把模型移到屏幕中心，并且按屏幕比例放大。
-        float m00 = (xmax - xmin) * 0.5f, m01 = 0,                     m02 = 0,                 m03 = (xmax + xmin) * 0.5f;
-        float m10 = 0,                    m11 = -(ymax - ymin) * 0.5f, m12 = 0,                 m13 = (ymax + ymin) * 0.5f;
-        float m20 = 0,                    m21 = 0,                     m22 = (far-near) * 0.5f, m23 = (far + near) * 0.5f;
-        float m30 = 0,                    m31 = 0,                     m32 = 0,                 m33 = 1f;
-        
-        viewportMatrix.set(m00, m01, m02, m03, m10, m11, m12, m13, m20, m21, m22, m23, m30, m31, m32, m33);
-    }
-    
-    /**
-     * 视口变换矩阵
-     */
-    public void updateViewportMatrix() {
-        float w = width * 0.5f;
-        float h = height * 0.5f;
-        
-        // 把模型移到屏幕中心，并且按屏幕比例放大。
-        float m00 = w, m01 = 0,  m02 = 0,  m03 = w;
-        float m10 = 0, m11 = -h, m12 = 0,  m13 = h;
-        float m20 = 0, m21 = 0,  m22 = 1f, m23 = 0;
-        float m30 = 0, m31 = 0,  m32 = 0,  m33 = 1;
-        
-        viewportMatrix.set(m00, m01, m02, m03, m10, m11, m12, m13, m20, m21, m22, m23, m30, m31, m32, m33);
-    }
-
     /**
      * 使摄像机观察指定位置
      * @param target

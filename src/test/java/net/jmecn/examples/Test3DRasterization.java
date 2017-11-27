@@ -2,6 +2,7 @@ package net.jmecn.examples;
 
 import net.jmecn.Application;
 import net.jmecn.math.Vector3f;
+import net.jmecn.math.Vector4f;
 import net.jmecn.renderer.Camera;
 import net.jmecn.scene.Mesh;
 
@@ -10,11 +11,11 @@ import net.jmecn.scene.Mesh;
  * @author yanmaoyuan
  *
  */
-public class Test3DView extends Application {
+public class Test3DRasterization extends Application {
 
     public static void main(String[] args) {
-        Test3DView app = new Test3DView();
-        app.setResolution(400, 300);
+        Test3DRasterization app = new Test3DRasterization();
+        app.setResolution(800, 600);
         app.setTitle("3D View");
         app.setFrameRate(60);
         app.start();
@@ -41,6 +42,18 @@ public class Test3DView extends Application {
             new Vector3f(1, 1, 1),
         };
         
+        // 顶点颜色
+        Vector4f[] colors = {
+            new Vector4f(0.5f, 0.5f, 0, 1),
+            new Vector4f(1, 0, 0, 1),
+            new Vector4f(0, 1, 0, 1),
+            new Vector4f(1, 1, 0, 1),
+            new Vector4f(0, 0, 1, 1),
+            new Vector4f(1, 0, 1, 1),
+            new Vector4f(0, 1, 1, 1),
+            new Vector4f(0, 0.5f, 0.5f, 1),
+        };
+        
         // 定义六面共12个三角形
         int[] indexes = {
             0, 2, 1, 1, 2, 3, // back
@@ -51,9 +64,8 @@ public class Test3DView extends Application {
             1, 4, 0, 1, 5, 4 // bottom
         };
         
-        mesh = new Mesh(positions, indexes);
-        mesh.setWireframe(true);
-        
+        mesh = new Mesh(positions, indexes, null, null, colors);
+        //mesh.setWireframe(true);
         // 添加到场景中
         meshes.add(mesh);
         

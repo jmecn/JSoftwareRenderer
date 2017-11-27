@@ -317,6 +317,35 @@ public final class Vector4f {
         return this;
     }
 
+    /**
+     * 在当前向量与final向量之间线性插值。
+     * 
+     * this=(1-changeAmnt)*this + changeAmnt * finalVec
+     * @param finalVec 终向量
+     * @param changeAmnt 插值系数，取值范围为 0.0 - 1.0。
+     */
+    public Vector4f interpolateLocal(Vector4f finalVec, float changeAmnt) {
+        this.x=(1-changeAmnt)*this.x + changeAmnt*finalVec.x;
+        this.y=(1-changeAmnt)*this.y + changeAmnt*finalVec.y;
+        this.z=(1-changeAmnt)*this.z + changeAmnt*finalVec.z;
+        this.w=(1-changeAmnt)*this.w + changeAmnt*finalVec.w;
+        return this;
+    }
+
+    /**
+     * 在当开始向量与终向量之间线性插值。
+     * this=(1-changeAmnt)*beginVec + changeAmnt * finalVec
+     * @param beginVec 开始向量（changeAmnt = 0）
+     * @param finalVec 终向量（changeAmnt = 1）
+     * @param changeAmnt 插值系数，取值范围为 0.0 - 1.0。
+     */
+    public Vector4f interpolateLocal(Vector4f beginVec,Vector4f finalVec, float changeAmnt) {
+        this.x=(1-changeAmnt)*beginVec.x + changeAmnt*finalVec.x;
+        this.y=(1-changeAmnt)*beginVec.y + changeAmnt*finalVec.y;
+        this.z=(1-changeAmnt)*beginVec.z + changeAmnt*finalVec.z;
+        this.w=(1-changeAmnt)*beginVec.w + changeAmnt*finalVec.w;
+        return this;
+    }
     public Vector4f set(float x, float y, float z, float w) {
         this.x = x;
         this.y = y;
