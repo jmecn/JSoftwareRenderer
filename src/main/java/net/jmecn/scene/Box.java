@@ -1,6 +1,5 @@
 package net.jmecn.scene;
 
-import net.jmecn.math.Transform;
 import net.jmecn.math.Vector2f;
 import net.jmecn.math.Vector3f;
 import net.jmecn.math.Vector4f;
@@ -106,6 +105,5 @@ public class Box extends Mesh {
             vertexes[index].color = new Vector4f( colors[index*4], colors[index*4+1], colors[index*4+2], colors[index*4+3]);
             vertexes[index].texCoord = new Vector2f(texCoords[index*2], texCoords[index*2+1]);
         }
-        this.transform = new Transform();
     }
 }

@@ -2,7 +2,11 @@ package net.jmecn.examples;
 
 import net.jmecn.Application;
 import net.jmecn.math.Vector3f;
+import net.jmecn.math.Vector4f;
 import net.jmecn.renderer.Camera;
+import net.jmecn.renderer.Material;
+import net.jmecn.renderer.RenderState;
+import net.jmecn.renderer.RenderState.FaceCullMode;
 import net.jmecn.scene.Mesh;
 
 /**
@@ -52,7 +56,15 @@ public class Test3DView extends Application {
         };
         
         mesh = new Mesh(positions, indexes);
-        mesh.setWireframe(true);
+        
+        // 定义材质
+        Material material = new Material();
+        mesh.setMaterial(material);
+        // 设置渲染模式
+        RenderState renderState = mesh.getMaterial().getRenderState();
+        renderState.setFaceCullMode(FaceCullMode.NEVER);
+        renderState.setWireframe(true);
+        renderState.setWireframeColor(new Vector4f(1, 0, 0, 1));
         
         // 添加到场景中
         meshes.add(mesh);

@@ -8,6 +8,7 @@ import net.jmecn.math.Vector2f;
 import net.jmecn.math.Vector3f;
 import net.jmecn.math.Vector4f;
 import net.jmecn.renderer.ImageRaster;
+import net.jmecn.renderer.Material;
 import net.jmecn.renderer.Vertex;
 
 /**
@@ -20,16 +21,16 @@ public class Mesh implements Drawable {
     protected Vertex[] vertexes;
     protected int[] indexes;
     
-    protected Texture texture;
+    protected Material material;
     
     /**
      * 空间变换
      */
     protected Transform transform;
 
-    protected boolean wireframe = false;
-
-    public Mesh() {}
+    public Mesh() {
+        this.transform = new Transform();
+    }
     
     public Mesh(Vector3f[] positions, int[] indexes) {
         this(positions, indexes, null, null, null);
@@ -64,7 +65,6 @@ public class Mesh implements Drawable {
                 vertexes[index].texCoord = texCoords[index];
             }
         }
-        this.indexes = indexes;
         this.transform = new Transform();
     }
 
@@ -79,21 +79,13 @@ public class Mesh implements Drawable {
     public int[] getIndexes() {
         return indexes;
     }
-
-    public boolean isWireframe() {
-        return wireframe;
+    
+    public Material getMaterial() {
+        return material;
     }
-
-    public Texture getTexture() {
-        return texture;
-    }
-
-    public void setTexture(Texture texture) {
-        this.texture = texture;
-    }
-
-    public void setWireframe(boolean wireframe) {
-        this.wireframe = wireframe;
+    
+    public void setMaterial(Material mat) {
+        this.material = mat;
     }
 
     @Override

@@ -5,6 +5,8 @@ import java.util.List;
 import net.jmecn.math.ColorRGBA;
 import net.jmecn.math.Matrix4f;
 import net.jmecn.math.Vector3f;
+import net.jmecn.math.Vector4f;
+import net.jmecn.renderer.RenderState.FaceCullMode;
 import net.jmecn.scene.Mesh;
 
 /**
@@ -28,7 +30,7 @@ public class Renderer {
      */
     public Renderer(int width, int height) {
         image = new Image(width, height);
-        raster = new VertexRaster(image);
+        raster = new VertexRaster(this, image);
         
         // 计算视口变换矩阵
         updateViewportMatrix(width, height);
@@ -77,6 +79,8 @@ public class Renderer {
     private Matrix4f worldViewProjectionMatrix = new Matrix4f();
     
     private Matrix4f viewportMatrix = new Matrix4f();
+    
+    private Material material;
     
     /**
      * 视口变换矩阵
@@ -141,8 +145,10 @@ public class Renderer {
      */
     protected void render(Mesh mesh) {
         
-        // 设置采样用的纹理
-        raster.setTexture(mesh.getTexture());
+        // 设置材质
+        this.material = mesh.getMaterial();
+        // 设置渲染状态
+        this.raster.setRenderState(material.getRenderState());
         
         // 用于保存变换后的向量坐标。
         Vector3f a = new Vector3f();
@@ -180,16 +186,7 @@ public class Renderer {
             out1.perspectiveDivide();
             out2.perspectiveDivide();
             
-            // 把顶点位置修正到屏幕空间。
-            viewportMatrix.mult(out0.position, out0.position);
-            viewportMatrix.mult(out1.position, out1.position);
-            viewportMatrix.mult(out2.position, out2.position);
-            
-            if (mesh.isWireframe()) {
-                raster.drawTriangle(out0, out1, out2);
-            } else {
-                raster.rasterizeTriangle(out0, out1, out2);
-            }
+            raster.rasterizeTriangle(out0, out1, out2);
         }
     }
     
@@ -211,8 +208,22 @@ public class Renderer {
 
         // 计算表面法线
         Vector3f faceNormal = ab.crossLocal(bc);
+        
+        float dot = faceNormal.dot(c);
 
-        return faceNormal.dot(c) >= 0;
+        FaceCullMode cullMode = material.getRenderState().getFaceCullMode();
+        switch (cullMode) {
+        case NEVER:
+            return false;
+        case ALWAYS:
+            return true;
+        case BACK:
+            return dot >= 0;
+        case FACE:
+            return dot < 0;
+        default:
+                return false;
+        }
     }
     
     /**
@@ -240,11 +251,33 @@ public class Renderer {
             out.hasVertexColor = true;
         }
         
+        // 线框颜色
+        if (material.getRenderState().isWireframe()) {
+            Vector4f color = material.getRenderState().getWireframeColor();
+            if (color != null) {
+                out.color.set(color);
+                out.hasVertexColor = true;
+            }
+        }
+        
         // 顶点着色器
         // 模型-观察-透视 变换
         worldViewProjectionMatrix.mult(out.position, out.position);
         
         return out;
     }
+
+
+    public Matrix4f getViewportMatrix() {
+        return viewportMatrix;
+    }
     
+    public Matrix4f getViewProjectionMatrix() {
+        return viewProjectionMatrix;
+    }
+
+    public Material getMaterial() {
+        return material;
+    }
+
 }

@@ -2,6 +2,7 @@ package net.jmecn.examples;
 
 import net.jmecn.Application;
 import net.jmecn.math.Vector3f;
+import net.jmecn.renderer.Material;
 import net.jmecn.scene.Box;
 import net.jmecn.scene.Mesh;
 
@@ -28,6 +29,10 @@ public class Test3DRasterization extends Application {
         
         // 添加到场景中
         Mesh mesh = new Box();
+        // 定义材质
+        Material material = new Material();
+        mesh.setMaterial(material);
+        
         meshes.add(mesh);
     }
 

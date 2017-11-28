@@ -1,20 +1,32 @@
 package net.jmecn.renderer;
 
+import net.jmecn.math.Matrix4f;
 import net.jmecn.math.Vector4f;
 import net.jmecn.scene.Texture;
 
+/**
+ * 顶点光栅器
+ * @author yanmaoyuan
+ *
+ */
 public class VertexRaster extends ImageRaster {
 
+    private final static float INV_SCALE = 1f / 255f;
+    
     protected float[] depthBuffer;
     
-    public VertexRaster(Image image) {
-        super(image);
-        depthBuffer = new float[width * height];
+    protected Renderer renderer;
+    
+    protected RenderState renderState;
+    
+    public void setRenderState(RenderState renderState) {
+        this.renderState = renderState;
     }
     
-    private Texture texture;
-    public void setTexture(Texture texture) {
-        this.texture = texture;
+    public VertexRaster(Renderer renderer, Image image) {
+        super(image);
+        this.depthBuffer = new float[width * height];
+        this.renderer = renderer;
     }
     
     public void clearDepthBuffer() {
@@ -39,23 +51,95 @@ public class VertexRaster extends ImageRaster {
         // 执行片段着色器
         fragmentShader(frag);
 
+        int index = x + y * width;
+        
         float depth = frag.position.z / frag.position.w;
         
         // 深度测试
-        if (depthBuffer[x + y * width] > depth) {
-            depthBuffer[x + y * width] = depth;
+        if (renderState.isDepthTest() && !depthTest(depthBuffer[index], depth)) {
+            return;
+        }
+
+        // 写入深度缓冲
+        if (renderState.isDepthWrite()) {
+            depthBuffer[index] = depth;
         }
         
-        Vector4f color = frag.color;
+        Vector4f srcColor = frag.color;
         
-        // TODO BLEND混色
+        // BLEND混色
+        Vector4f destColor = getColor(x, y);
+        
+        switch (renderState.getBlendMode()) {
+        case OPACITY:
+            destColor.x = srcColor.x;
+            destColor.y = srcColor.y;
+            destColor.z = srcColor.z;
+            break;
+        case ADD:
+            destColor.x += srcColor.x;
+            destColor.y += srcColor.y;
+            destColor.z += srcColor.z;
+            break;
+        case ALPHA_BLEND:
+            destColor.x = destColor.x + (srcColor.x - destColor.x) * srcColor.w;
+            destColor.y = destColor.y + (srcColor.y - destColor.y) * srcColor.w;
+            destColor.z = destColor.z + (srcColor.z - destColor.z) * srcColor.w;
+            break;
+        }
+        
+        destColor.x = clamp(destColor.x, 0, 1);
+        destColor.y = clamp(destColor.y, 0, 1);
+        destColor.z = clamp(destColor.z, 0, 1);
+        destColor.w = clamp(destColor.w, 0, 1);
+        
+        // 写入frameBuffer
+        index *= 4;
+
+        components[index] = (byte)(destColor.x * 0xFF);
+        components[index + 1] = (byte)(destColor.y * 0xFF);
+        components[index + 2] = (byte)(destColor.z * 0xFF);
+        components[index + 3] = (byte)(destColor.w * 0xFF);
+    }
+    
+    /**
+     * 夹逼对齐
+     * @param v
+     * @param min
+     * @param max
+     * @return
+     */
+    float clamp(float v, float min, float max) {
+        if (min > max) {
+            float tmp = max;
+            max = min;
+            min = tmp;
+        }
+        
+        if (v < min)
+            v = min;
+        if (v > max)
+            v = max;
+        return v;
+    }
+    
+    /**
+     * 提取颜色
+     * @param x
+     * @param y
+     * @return
+     */
+    public Vector4f getColor(int x, int y) {
+        Vector4f color = new Vector4f();
         
         int index = (x + y * width) * 4;
-
-        components[index] = (byte)(color.x * 0xFF);
-        components[index + 1] = (byte)(color.y * 0xFF);
-        components[index + 2] = (byte)(color.z * 0xFF);
-        components[index + 3] = (byte)(color.w * 0xFF);
+        float r = (float)(0xFF & components[index]) * INV_SCALE;
+        float g = (float)(0xFF & components[index+1]) * INV_SCALE;
+        float b = (float)(0xFF & components[index+2]) * INV_SCALE;
+        float a = (float)(0xFF & components[index+3]) * INV_SCALE;
+        
+        color.set(r, g, b, a);
+        return color;
     }
 
     public void drawTriangle(VertexOut v0, VertexOut v1, VertexOut v2) {
@@ -71,6 +155,19 @@ public class VertexRaster extends ImageRaster {
      * @param v2
      */
     public void rasterizeTriangle(VertexOut v0, VertexOut v1, VertexOut v2) {
+        
+        Matrix4f viewportMatrix = renderer.getViewportMatrix();
+        
+        // 把顶点位置修正到屏幕空间。
+        viewportMatrix.mult(v0.position, v0.position);
+        viewportMatrix.mult(v1.position, v1.position);
+        viewportMatrix.mult(v2.position, v2.position);
+        
+        if (renderState.isWireframe()) {
+            drawTriangle(v0, v1, v2);
+            return;
+        }
+        
         // 按Y坐标把三个顶点从上到下冒泡排序
         VertexOut tmp;
         if (v0.position.y > v1.position.y) {
@@ -252,10 +349,37 @@ public class VertexRaster extends ImageRaster {
     }
     
     /**
+     * 深度测试
+     * @param oldDepth
+     * @param newDepth
+     * @return
+     */
+    private boolean depthTest(float oldDepth, float newDepth) {
+        switch (renderState.getDepthMode()) {
+        case ALWAYS:
+            return true;
+        case LESS:
+            return newDepth < oldDepth;
+        case LESS_EQUAL:
+            return newDepth <= oldDepth;
+        case GREATER:
+            return newDepth > oldDepth;
+        case GREATER_EQUAL:
+            return newDepth >= oldDepth;
+        case EQUAL:
+            return newDepth == oldDepth;
+        case NOT_EQUAL:
+            return newDepth != oldDepth;
+        }
+        return false;
+    }
+    
+    /**
      * 片段着色器
      * @param frag
      */
     private void fragmentShader(VertexOut frag) {
+        Texture texture = renderer.getMaterial().getTexture();
         if (texture != null && frag.hasTexCoord) {
             Vector4f texColor = texture.sample2d(frag.texCoord);
             frag.color.multLocal(texColor);

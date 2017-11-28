@@ -38,7 +38,7 @@ public class Texture {
                 int i = x / 8;
                 int j = y / 8;
                 if ((i + j) % 2 == 0) {
-                    raster.drawPixel(x, y, ColorRGBA.BLACK);
+                    raster.drawPixel(x, y, ColorRGBA.BLACK_NO_ALPHA);
                 }
             }
         }
