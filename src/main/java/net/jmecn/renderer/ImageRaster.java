@@ -363,4 +363,5 @@ public class ImageRaster {
             drawLine(xs, y, xe, y, color);
         }
     }
+
 }

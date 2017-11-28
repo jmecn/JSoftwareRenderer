@@ -33,7 +33,7 @@ public class CameraController {
     
     public void update(float delta) {
         // 鼠标拖拽旋转摄像机
-        dragRotate(delta);
+        dragRotate();
 
         // 按键旋转摄像机
         keyRotate(delta);
@@ -42,28 +42,34 @@ public class CameraController {
         keyMove(delta);
     }
     
-    private Vector2f last;
+    // 记录鼠标的点击位置，用于计算鼠标在画布上的相对位移。
+    private Vector2f last = new Vector2f(-1, -1);
     private Vector2f cur = new Vector2f();
-    private Vector2f dxy = new Vector2f();
-    private void dragRotate(float delta) {
+    // 鼠标灵敏度
+    private float sensivive = 0.003f;
+    /**
+     * 鼠标拖拽旋转摄像机
+     */
+    private void dragRotate() {
         if (input.getMouseButton(MouseEvent.BUTTON1)) {
             
             // 首次按键
-            if (last == null) {
-                last = new Vector2f(input.getStart());
-                cur.set(input.getStart());
+            if (last.x == -1 && last.y == -1) {
+                last.set(input.getStart());
             }
-            cur.set(input.getStop());
-            dxy = cur.subtract(last, dxy);
+            cur.set(input.getCurrent());
+            
+            // 计算相对位移
+            float dx = cur.x - last.x;
+            float dy = cur.y - last.y;
+            
+            if (dx*dx + dy*dy > 0) {
+                camera.rotate(-dy * sensivive, -dx * sensivive, 0);
+                last.set(cur);
+            }
+            
         } else {
-            last = null;
-            dxy.set(0, 0);
-            cur.set(0, 0);
-        }
-        
-        if (last != null && dxy.lengthSquared() > 0) {
-            camera.rotate(-dxy.y*0.005f, -dxy.x*0.005f, 0);
-            last.set(cur);
+            last.set(-1, -1);
         }
     }
     

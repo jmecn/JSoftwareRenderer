@@ -8,6 +8,7 @@ import net.jmecn.math.Vector3f;
 import net.jmecn.math.Vector4f;
 import net.jmecn.scene.Mesh;
 import net.jmecn.scene.Vertex;
+import net.jmecn.scene.VertexOut;
 
 /**
  * 渲染器
@@ -51,6 +52,7 @@ public class Renderer {
      */
     public void clear() {
         imageRaster.fill(clearColor);
+        imageRaster.clearDepthBuffer();
     }
 
     /**
@@ -137,6 +139,9 @@ public class Renderer {
         int[] indexes = mesh.getIndexes();// 顶点索引
         Vertex[] vertexes = mesh.getVertexes();
         
+        // 设置采样用的纹理
+        imageRaster.setTexture(mesh.getTexture());
+        
         // 用于保存变换后的向量坐标。
         Vector3f a = new Vector3f();
         Vector3f b = new Vector3f();
@@ -158,23 +163,21 @@ public class Renderer {
                 continue;
 
             // 使用齐次坐标计算顶点。
-            vertexShader(v0);
-            vertexShader(v1);
-            vertexShader(v2);
+            VertexOut out0 = vertexShader(v0);
+            VertexOut out1 = vertexShader(v1);
+            VertexOut out2 = vertexShader(v2);
 
-            v0.fragCoord.multLocal(1f / v0.fragCoord.w); // 透视除法
-            v1.fragCoord.multLocal(1f / v1.fragCoord.w); // 透视除法
-            v2.fragCoord.multLocal(1f / v2.fragCoord.w); // 透视除法
+            // TODO 视锥裁剪
             
             // 把顶点位置修正到屏幕空间。
-            viewportMatrix.mult(v0.fragCoord, v0.fragCoord);
-            viewportMatrix.mult(v1.fragCoord, v1.fragCoord);
-            viewportMatrix.mult(v2.fragCoord, v2.fragCoord);
+            viewportMatrix.mult(out0.fragCoord, out0.fragCoord);
+            viewportMatrix.mult(out1.fragCoord, out1.fragCoord);
+            viewportMatrix.mult(out2.fragCoord, out2.fragCoord);
             
             if (mesh.isWireframe()) {
-                imageRaster.drawTriangle(v0, v1, v2);
+                imageRaster.drawTriangle(out0, out1, out2);
             } else {
-                imageRaster.fillTriangle(v0, v1, v2);
+                imageRaster.fillTriangle(out0, out1, out2);
             }
         }
     }
@@ -201,16 +204,47 @@ public class Renderer {
         return faceNormal.dot(c) >= 0;
     }
     
-    protected void vertexShader(Vertex vert) {
+    /**
+     * 顶点着色
+     * @param vert
+     * @return
+     */
+    protected VertexOut vertexShader(Vertex vert) {
+        VertexOut out = new VertexOut();
+        
+        /**
+         * 顶点着色器部分
+         */
+        
         // 模型-观察-透视 变换
-        worldViewProjectionMatrix.mult(new Vector4f(vert.position, 1), vert.fragCoord);
+        worldViewProjectionMatrix.mult(new Vector4f(vert.position, 1), out.position);
 
-        // 设置顶点颜色
-        if (vert.color == null) {
-            vert.fragColor.set(1, 1, 1, 1);
-        } else {
-            vert.fragColor.set(vert.color);
+        
+        /**
+         * 顶点着色器部分 - END
+         */
+        
+        /**
+         * 准备输出数据
+         */
+        out.calcFragCoord();
+        
+        if (vert.normal != null) {
+            out.normal.set(vert.normal);
+            out.hasNormal = true;
         }
+        
+        if (vert.texCoord != null) {
+            out.texCoord.set(vert.texCoord);
+            out.hasTexCoord = true;
+        }
+        
+        // 设置顶点颜色
+        if (vert.color != null) {
+            out.fragColor.set(vert.color);
+        }
+        
+        return out;
     }
     
 }

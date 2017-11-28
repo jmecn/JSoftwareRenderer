@@ -2,9 +2,10 @@ package net.jmecn.examples;
 
 import net.jmecn.Application;
 import net.jmecn.math.Vector3f;
-import net.jmecn.math.Vector4f;
 import net.jmecn.renderer.Camera;
+import net.jmecn.scene.Box;
 import net.jmecn.scene.Mesh;
+import net.jmecn.scene.Texture;
 
 /**
  * 测试3D观察的效果
@@ -29,43 +30,13 @@ public class Test3DRasterization extends Application {
     
     @Override
     protected void initialize() {
+        // 使用程序纹理
+        Texture texture = new Texture();
+        texture.setLinearFilter(true);
         
-        // 立方体
-        Vector3f[] positions = {
-            new Vector3f(-1, -1, -1),
-            new Vector3f(1, -1, -1),
-            new Vector3f(-1, 1, -1),
-            new Vector3f(1, 1, -1),
-            new Vector3f(-1, -1, 1),
-            new Vector3f(1, -1, 1),
-            new Vector3f(-1, 1, 1),
-            new Vector3f(1, 1, 1),
-        };
+        mesh = new Box();
+        mesh.setTexture(texture);
         
-        // 顶点颜色
-        Vector4f[] colors = {
-            new Vector4f(0.5f, 0.5f, 0, 1),
-            new Vector4f(1, 0, 0, 1),
-            new Vector4f(0, 1, 0, 1),
-            new Vector4f(1, 1, 0, 1),
-            new Vector4f(0, 0, 1, 1),
-            new Vector4f(1, 0, 1, 1),
-            new Vector4f(0, 1, 1, 1),
-            new Vector4f(0, 0.5f, 0.5f, 1),
-        };
-        
-        // 定义六面共12个三角形
-        int[] indexes = {
-            0, 2, 1, 1, 2, 3, // back
-            4, 5, 7, 4, 7, 6, // front
-            5, 1, 3, 5, 3, 7, // left
-            0, 6, 2, 0, 4, 6, // right
-            2, 6, 7, 2, 7, 3, // top
-            1, 4, 0, 1, 5, 4 // bottom
-        };
-        
-        mesh = new Mesh(positions, indexes, null, null, colors);
-        //mesh.setWireframe(true);
         // 添加到场景中
         meshes.add(mesh);
         

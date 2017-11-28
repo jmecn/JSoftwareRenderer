@@ -20,7 +20,7 @@ public class Input implements KeyListener, MouseListener, MouseMotionListener {
     private boolean[] mouse = new boolean[4];
 
     private Vector2f start = new Vector2f();
-    private Vector2f stop = new Vector2f();
+    private Vector2f current = new Vector2f();
     private Vector2f delta = new Vector2f();
     
     public boolean getKey(int key) {
@@ -35,20 +35,19 @@ public class Input implements KeyListener, MouseListener, MouseMotionListener {
     public boolean getMouseButton(int button) {
         return mouse[button];
     }
-
     /**
-     * 获得鼠标的终点坐标
+     * 获得鼠标的起点坐标
      * @return
      */
     public Vector2f getStart() {
         return start;
     }
     /**
-     * 获得鼠标的起点坐标
+     * 获得鼠标的当前坐标
      * @return
      */
-    public Vector2f getStop() {
-        return stop;
+    public Vector2f getCurrent() {
+        return current;
     }
     /**
      * 返回鼠标的相对位移
@@ -78,8 +77,8 @@ public class Input implements KeyListener, MouseListener, MouseMotionListener {
 
     @Override
     public void mouseDragged(MouseEvent e) {
-        stop.set(e.getX(), e.getY());
-        stop.subtract(start, delta);
+        current.set(e.getX(), e.getY());
+        current.subtract(start, delta);
     }
 
     @Override
@@ -93,7 +92,7 @@ public class Input implements KeyListener, MouseListener, MouseMotionListener {
     public void mousePressed(MouseEvent e) {
         mouse[e.getButton()] = true;
         start.set(e.getX(), e.getY());
-        stop.set(e.getX(), e.getY());
+        current.set(e.getX(), e.getY());
         delta.set(0, 0);
     }
 

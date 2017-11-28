@@ -16,18 +16,20 @@ import net.jmecn.renderer.ImageRaster;
  *
  */
 public class Mesh implements Drawable {
-    private Vertex[] vertexes;
-    /**
-     * 顶点索引
-     */
-    private int[] indexes;
+    protected Vertex[] vertexes;
+    protected int[] indexes;
+    
+    protected Texture texture;
+    
     /**
      * 空间变换
      */
-    private Transform transform;
+    protected Transform transform;
 
-    private boolean wireframe = false;
+    protected boolean wireframe = false;
 
+    public Mesh() {}
+    
     public Mesh(Vector3f[] positions, int[] indexes) {
         this(positions, indexes, null, null, null);
     }
@@ -41,7 +43,6 @@ public class Mesh implements Drawable {
      * @param colors
      */
     public Mesh(Vector3f[] positions, int[] indexes, Vector2f[] texCoords, Vector3f[] normals, Vector4f[] colors) {
-        this.transform = new Transform();
         this.indexes = indexes;
         this.vertexes = new Vertex[positions.length];
         
@@ -80,6 +81,14 @@ public class Mesh implements Drawable {
 
     public boolean isWireframe() {
         return wireframe;
+    }
+
+    public Texture getTexture() {
+        return texture;
+    }
+
+    public void setTexture(Texture texture) {
+        this.texture = texture;
     }
 
     public void setWireframe(boolean wireframe) {

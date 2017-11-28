@@ -11,9 +11,6 @@ public class Vertex {
     public Vector4f color;     // 顶点颜色
     public Vector2f texCoord;  // 纹理坐标
     
-    public Vector4f fragCoord = new Vector4f(0);  // 顶点位置
-    public Vector4f fragColor = new Vector4f(1);  // 顶点颜色
-    
     public Vertex interpolateLocal(Vertex beginVec, Vertex finalVec, float changeAmnt) {
         // 顶点插值
         if (beginVec.position != null && finalVec.position != null) {
@@ -43,17 +40,6 @@ public class Vertex {
         if (beginVec.texCoord != null && finalVec.texCoord != null) {
             texCoord = new Vector2f();
             texCoord.interpolateLocal(beginVec.texCoord, finalVec.texCoord, changeAmnt);
-        }
-        
-        // 片段坐标插值
-        if (beginVec.fragCoord != null && finalVec.fragCoord != null) {
-            fragCoord = new Vector4f();
-            fragCoord.interpolateLocal(beginVec.fragCoord, finalVec.fragCoord, changeAmnt);
-        }
-        // 片段颜色插值
-        if (beginVec.fragColor != null && finalVec.fragColor != null) {
-            fragColor = new Vector4f();
-            fragColor.interpolateLocal(beginVec.fragColor, finalVec.fragColor, changeAmnt);
         }
         return this;
     }
