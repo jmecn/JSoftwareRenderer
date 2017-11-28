@@ -59,7 +59,11 @@ public class VertexOut {
      * 透视除法
      */
     public void perspectiveDivide() {
-        position.multLocal(1f / position.w);
+        float scalor = 1f / position.w;
+        position.x *= scalor;
+        position.y *= scalor;
+        position.z *= scalor;
+        position.w *= scalor;
     }
     
     /**

@@ -47,13 +47,13 @@ public class VertexRaster extends ImageRaster {
         if (x < 0 || y < 0 || x >= width || y >= height) {
             return;
         }
-        
+       
         // 执行片段着色器
         fragmentShader(frag);
 
         int index = x + y * width;
         
-        float depth = frag.position.z / frag.position.w;
+        float depth = frag.position.z;
         
         // 深度测试
         if (renderState.isDepthTest() && !depthTest(depthBuffer[index], depth)) {
