@@ -77,38 +77,42 @@ public class Texture {
      * @return
      */
     protected Vector4f linear(float s, float t) {
-        Vector4f color = new Vector4f(1);
-
         // 计算坐标
         float u = (float) (width - 1) * s;
         float v = (float) (height - 1) * (1 - t);
 
         // 取整
-        int iu = (int) u;
-        int iv = (int) v;
-
-        int uNext = iu + 1 <= (width - 1) ? iu + 1 : iu;
-        int vNext = iv + 1 <= (height - 1) ? iv + 1 : iv;
-
-        // 计算贡献值
-        float uNextPer = u - iu;
-        float vNextPer = v - iv;
-        float uPer = 1.0f - uNextPer;
-        float vPer = 1.0f - vNextPer;
-
-        color = getColor(iu, iv);
-
-        // 另外三个采样点
-        Vector4f colorNextU = getColor(uNext, iv);
-        Vector4f colorNextV = getColor(iu, vNext);
-        Vector4f colorNextUV = getColor(uNext, vNext);
+        int iu0 = (int) u;
+        int iv0 = (int) v;
         
-        color.x=color.x*uPer*vPer+colorNextU.x*uNextPer*vPer+colorNextV.x*uPer*vNextPer+colorNextUV.x*uNextPer*vNextPer;  
-        color.y=color.y*uPer*vPer+colorNextU.y*uNextPer*vPer+colorNextV.y*uPer*vNextPer+colorNextUV.y*uNextPer*vNextPer;  
-        color.z=color.z*uPer*vPer+colorNextU.z*uNextPer*vPer+colorNextV.z*uPer*vNextPer+colorNextUV.z*uNextPer*vNextPer;  
-        color.w=color.w*uPer*vPer+colorNextU.w*uNextPer*vPer+colorNextV.w*uPer*vNextPer+colorNextUV.w*uNextPer*vNextPer;  
+        int iu1 = iu0 + 1;
+        int iv1 = iv0 + 1;
         
-        return color;
+        if (iu1 > width - 1)
+            iu1 = iu0;
+        
+        if (iv1 > height - 1)
+            iv1 = iv0;
+
+        // 四个采样点
+        Vector4f c0 = getColor(iu0, iv0);
+        Vector4f c1 = getColor(iu1, iv0);
+        Vector4f c2 = getColor(iu0, iv1);
+        Vector4f c3 = getColor(iu1, iv1);
+        
+        // 计算四个采样点的贡献值
+        float du0 = u - iu0;
+        float dv0 = v - iv0;
+        float du1 = 1f - du0;
+        float dv1 = 1f - dv0;
+        
+        // 计算最终的颜色
+        c0.x = c0.x * du1 * dv1 + c1.x * du0 * dv1 + c2.x * du1 * dv0 + c3.x * du0 * dv0;
+        c0.y = c0.y * du1 * dv1 + c1.y * du0 * dv1 + c2.y * du1 * dv0 + c3.y * du0 * dv0;
+        c0.z = c0.z * du1 * dv1 + c1.z * du0 * dv1 + c2.z * du1 * dv0 + c3.z * du0 * dv0;
+        c0.w = c0.w * du1 * dv1 + c1.w * du0 * dv1 + c2.w * du1 * dv0 + c3.w * du0 * dv0;
+        
+        return c0;
     }
 
     /**

@@ -5,10 +5,7 @@ import java.util.List;
 import net.jmecn.math.ColorRGBA;
 import net.jmecn.math.Matrix4f;
 import net.jmecn.math.Vector3f;
-import net.jmecn.math.Vector4f;
 import net.jmecn.scene.Mesh;
-import net.jmecn.scene.Vertex;
-import net.jmecn.scene.VertexOut;
 
 /**
  * 渲染器
@@ -20,7 +17,7 @@ public class Renderer {
     // 渲染图像
     private Image image;
     // 光栅器
-    private RenderContext imageRaster;
+    private VertexRaster raster;
     // 清屏颜色
     private ColorRGBA clearColor = ColorRGBA.WHITE;
     
@@ -31,7 +28,7 @@ public class Renderer {
      */
     public Renderer(int width, int height) {
         image = new Image(width, height);
-        imageRaster = new RenderContext(image);
+        raster = new VertexRaster(image);
         
         // 计算视口变换矩阵
         updateViewportMatrix(width, height);
@@ -51,8 +48,8 @@ public class Renderer {
      * 使用背景色填充图像数据
      */
     public void clear() {
-        imageRaster.fill(clearColor);
-        imageRaster.clearDepthBuffer();
+        raster.fill(clearColor);
+        raster.clearDepthBuffer();
     }
 
     /**
@@ -68,7 +65,7 @@ public class Renderer {
      * @return
      */
     public ImageRaster getImageRaster() {
-        return imageRaster;
+        return raster;
     }
 
     private Matrix4f worldMatrix = new Matrix4f();
@@ -117,30 +114,35 @@ public class Renderer {
      */
     public void render(List<Mesh> meshes, Camera camera) {
         
+        // 根据Camera初始化观察变换矩阵。
         viewMatrix.set(camera.getViewMatrix());
         projectionMatrix.set(camera.getProjectionMatrix());
         viewProjectionMatrix.set(camera.getViewProjectionMatrix());
-        
+
+        // 遍历场景中的Mesh
         for(int i=0; i<meshes.size(); i++) {
             Mesh mesh = meshes.get(i);
             
-            // 世界变换矩阵
+            // 根据Mesh的世界变换，计算MVP等变换矩阵。
             worldMatrix.set(mesh.getTransform().toTransformMatrix());
-            // 世界-观察变换矩阵
             viewMatrix.mult(worldMatrix, worldViewMatrix);
-            // 世界-观察-投影变换矩阵
             viewProjectionMatrix.mult(worldMatrix, worldViewProjectionMatrix);
             
+            // TODO 剔除不可见的Mesh
+            
+            // 渲染
             render(mesh);
         }
     }
-    
+
+    /**
+     * 渲染单个Mesh
+     * @param mesh
+     */
     protected void render(Mesh mesh) {
-        int[] indexes = mesh.getIndexes();// 顶点索引
-        Vertex[] vertexes = mesh.getVertexes();
         
         // 设置采样用的纹理
-        imageRaster.setTexture(mesh.getTexture());
+        raster.setTexture(mesh.getTexture());
         
         // 用于保存变换后的向量坐标。
         Vector3f a = new Vector3f();
@@ -148,6 +150,9 @@ public class Renderer {
         Vector3f c = new Vector3f();
         
         // 遍历所有三角形
+        int[] indexes = mesh.getIndexes();
+        Vertex[] vertexes = mesh.getVertexes();
+        
         for (int i = 0; i < indexes.length; i += 3) {
 
             Vertex v0 = vertexes[indexes[i]];
@@ -162,22 +167,28 @@ public class Renderer {
             if (cullBackFace(a, b, c))
                 continue;
 
-            // 使用齐次坐标计算顶点。
+            // 执行顶点着色器
             VertexOut out0 = vertexShader(v0);
             VertexOut out1 = vertexShader(v1);
             VertexOut out2 = vertexShader(v2);
 
             // TODO 视锥裁剪
             
+            
+            // x,y,z除以w
+            out0.perspectiveDivide();
+            out1.perspectiveDivide();
+            out2.perspectiveDivide();
+            
             // 把顶点位置修正到屏幕空间。
-            viewportMatrix.mult(out0.fragCoord, out0.fragCoord);
-            viewportMatrix.mult(out1.fragCoord, out1.fragCoord);
-            viewportMatrix.mult(out2.fragCoord, out2.fragCoord);
+            viewportMatrix.mult(out0.position, out0.position);
+            viewportMatrix.mult(out1.position, out1.position);
+            viewportMatrix.mult(out2.position, out2.position);
             
             if (mesh.isWireframe()) {
-                imageRaster.drawTriangle(out0, out1, out2);
+                raster.drawTriangle(out0, out1, out2);
             } else {
-                imageRaster.fillTriangle(out0, out1, out2);
+                raster.rasterizeTriangle(out0, out1, out2);
             }
         }
     }
@@ -211,38 +222,27 @@ public class Renderer {
      */
     protected VertexOut vertexShader(Vertex vert) {
         VertexOut out = new VertexOut();
-        
-        /**
-         * 顶点着色器部分
-         */
-        
-        // 模型-观察-透视 变换
-        worldViewProjectionMatrix.mult(new Vector4f(vert.position, 1), out.position);
-
-        
-        /**
-         * 顶点着色器部分 - END
-         */
-        
-        /**
-         * 准备输出数据
-         */
-        out.calcFragCoord();
-        
+        // 顶点位置
+        out.position.set(vert.position, 1f);
+        // 顶点法线
         if (vert.normal != null) {
             out.normal.set(vert.normal);
             out.hasNormal = true;
         }
-        
+        // 纹理坐标
         if (vert.texCoord != null) {
             out.texCoord.set(vert.texCoord);
             out.hasTexCoord = true;
         }
-        
-        // 设置顶点颜色
+        // 顶点颜色
         if (vert.color != null) {
-            out.fragColor.set(vert.color);
+            out.color.set(vert.color);
+            out.hasVertexColor = true;
         }
+        
+        // 顶点着色器
+        // 模型-观察-透视 变换
+        worldViewProjectionMatrix.mult(out.position, out.position);
         
         return out;
     }

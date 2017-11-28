@@ -4,6 +4,7 @@ import net.jmecn.math.Transform;
 import net.jmecn.math.Vector2f;
 import net.jmecn.math.Vector3f;
 import net.jmecn.math.Vector4f;
+import net.jmecn.renderer.Vertex;
 
 /**
  * 一个立方体

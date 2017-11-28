@@ -2,13 +2,12 @@ package net.jmecn.renderer;
 
 import net.jmecn.math.Vector4f;
 import net.jmecn.scene.Texture;
-import net.jmecn.scene.VertexOut;
 
-public class RenderContext extends ImageRaster {
+public class VertexRaster extends ImageRaster {
 
     protected float[] depthBuffer;
     
-    public RenderContext(Image image) {
+    public VertexRaster(Image image) {
         super(image);
         depthBuffer = new float[width * height];
     }
@@ -26,53 +25,30 @@ public class RenderContext extends ImageRaster {
     }
     
     /**
-     * 画点
-     * 
+     * 光栅化点
      * @param x
      * @param y
-     * @param fragColor
+     * @param frag
      */
-    public void drawFragment(int x, int y, Vector4f fragColor) {
+    public void rasterizePoint(int x, int y, VertexOut frag) {
         
         if (x < 0 || y < 0 || x >= width || y >= height) {
             return;
         }
-
-        int index = (x + y * width) * 4;
-
-        components[index] = (byte)(fragColor.x * 0xFF);
-        components[index + 1] = (byte)(fragColor.y * 0xFF);
-        components[index + 2] = (byte)(fragColor.z * 0xFF);
-        components[index + 3] = (byte)(fragColor.w * 0xFF);
-    }
-    
-    /**
-     * 片段着色
-     * 
-     * @param x
-     * @param y
-     * @param color
-     */
-    public void fragmentShader(VertexOut frag) {
-        int x = Math.round(frag.fragCoord.x);
-        int y = Math.round(frag.fragCoord.y);
         
-        if (x < 0 || y < 0 || x >= width || y >= height) {
-            return;
-        }
+        // 执行片段着色器
+        fragmentShader(frag);
 
+        float depth = frag.position.z / frag.position.w;
+        
         // 深度测试
-        if (depthBuffer[x + y * width] > frag.fragCoord.z) {
-            depthBuffer[x + y * width] = frag.fragCoord.z;
+        if (depthBuffer[x + y * width] > depth) {
+            depthBuffer[x + y * width] = depth;
         }
         
-        Vector4f color = new Vector4f();
-        color.set(frag.fragColor);
+        Vector4f color = frag.color;
         
-        if (texture != null) {
-            Vector4f texColor = texture.sample2d(frag.texCoord);
-            color.multLocal(texColor);
-        }
+        // TODO BLEND混色
         
         int index = (x + y * width) * 4;
 
@@ -83,59 +59,61 @@ public class RenderContext extends ImageRaster {
     }
 
     public void drawTriangle(VertexOut v0, VertexOut v1, VertexOut v2) {
-        drawLineBresenham(v0, v1);
-        drawLineBresenham(v0, v2);
-        drawLineBresenham(v1, v2);
+        rasterizeLine(v0, v1);
+        rasterizeLine(v0, v2);
+        rasterizeLine(v1, v2);
     }
     
-    public void fillTriangle(VertexOut v0, VertexOut v1, VertexOut v2) {
+    /**
+     * 光栅化三角形
+     * @param v0
+     * @param v1
+     * @param v2
+     */
+    public void rasterizeTriangle(VertexOut v0, VertexOut v1, VertexOut v2) {
         // 按Y坐标把三个顶点从上到下冒泡排序
         VertexOut tmp;
-        if (v0.fragCoord.y > v1.fragCoord.y) {
+        if (v0.position.y > v1.position.y) {
             tmp = v0;
             v0 = v1;
             v1 = tmp;
         }
-        if (v1.fragCoord.y > v2.fragCoord.y) {
+        if (v1.position.y > v2.position.y) {
             tmp = v1;
             v1 = v2;
             v2 = tmp;
         }
-        if (v0.fragCoord.y > v1.fragCoord.y) {
+        if (v0.position.y > v1.position.y) {
             tmp = v0;
             v0 = v1;
             v1 = tmp;
         }
         
-        float x0 = v0.fragCoord.x;
-        float y0 = v0.fragCoord.y;
-        float x1 = v1.fragCoord.x;
-        float y1 = v1.fragCoord.y;
-        float x2 = v2.fragCoord.x;
-        float y2 = v2.fragCoord.y;
+        float y0 = v0.position.y;
+        float y1 = v1.position.y;
+        float y2 = v2.position.y;
         
         if (y0 == y1) {// 平顶
             fillTopLineTriangle(v0, v1, v2);
         } else if (y1 == y2) {// 平底
             fillBottomLineTriangle(v0, v1, v2);
         } else {// 分割三角形
+            
+            // 线性插值
             float t = (y1 - y0) / (y2 - y0);
-            // 长边在ymiddle时的x，来决定长边是在左边还是右边
-            float middleX = (float)(t * (x2 - x0) + x0);
+            VertexOut middleVert = new VertexOut();
+            middleVert.interpolateLocal(v0, v2, t);
             
-            VertexOut newVert = new VertexOut();
-            newVert.interpolateLocal(v0, v2, t);
-            
-            if (middleX <= x1)  {// 左三角形
+            if (middleVert.position.x <= v1.position.x)  {// 左三角形
                 // 画平底
-                fillBottomLineTriangle(v0, newVert, v1);
+                fillBottomLineTriangle(v0, middleVert, v1);
                 // 画平顶
-                fillTopLineTriangle(newVert, v1, v2);
+                fillTopLineTriangle(middleVert, v1, v2);
             } else {// 右三角形
                 // 画平底
-                fillBottomLineTriangle(v0, v1, newVert);
+                fillBottomLineTriangle(v0, v1, middleVert);
                 // 画平顶
-                fillTopLineTriangle(v1, newVert, v2);
+                fillTopLineTriangle(v1, middleVert, v2);
             }
         }
     }
@@ -147,14 +125,15 @@ public class RenderContext extends ImageRaster {
      * @param v2 底边右顶点
      */
     private void fillBottomLineTriangle(VertexOut v0, VertexOut v1, VertexOut v2) {
-        int y0 = (int) Math.ceil(v0.fragCoord.y);
-        int y2 = (int) Math.ceil(v2.fragCoord.y);
+        int y0 = (int) Math.ceil(v0.position.y);
+        int y2 = (int) Math.ceil(v2.position.y);
         
         for (int y = y0; y <y2; y++) {
             if (y >= 0 && y < this.height) {
                 
-                //插值生成左右顶点
-                float t = (y - v0.fragCoord.y) / (v1.fragCoord.y - v0.fragCoord.y);
+                // 插值生成左右顶点
+                // FIXME 需要透视校正
+                float t = (y - v0.position.y) / (v1.position.y - v0.position.y);
                 
                 VertexOut vl = new VertexOut();
                 vl.interpolateLocal(v0, v1, t);
@@ -162,7 +141,7 @@ public class RenderContext extends ImageRaster {
                 vr.interpolateLocal(v0, v2, t);
 
                 //扫描线填充
-                drawScanline(vl, vr, y);
+                rasterizeScanline(vl, vr, y);
             }
         }
     }
@@ -174,13 +153,14 @@ public class RenderContext extends ImageRaster {
      * @param v2 下顶点
      */
     private void fillTopLineTriangle(VertexOut v0, VertexOut v1, VertexOut v2) {
-        int y0 = (int) Math.ceil(v0.fragCoord.y);
-        int y2 = (int) Math.ceil(v2.fragCoord.y);
+        int y0 = (int) Math.ceil(v0.position.y);
+        int y2 = (int) Math.ceil(v2.position.y);
 
         for (int y = y0; y < y2; y++) {
             if (y >= 0 && y < this.height) {
-                //插值生成左右顶点
-                float t = (y - v0.fragCoord.y) / (v2.fragCoord.y - v0.fragCoord.y);
+                // 插值生成左右顶点
+                // FIXME 需要透视校正
+                float t = (y - v0.position.y) / (v2.position.y - v0.position.y);
                 
                 VertexOut vl = new VertexOut();
                 vl.interpolateLocal(v0, v2, t);
@@ -188,51 +168,46 @@ public class RenderContext extends ImageRaster {
                 vr.interpolateLocal(v1, v2, t);
                 
                 //扫描线填充
-                drawScanline(vl, vr, y);
+                rasterizeScanline(vl, vr, y);
             }
         }
     }
     
     /**
-     * 画扫描线
+     * 光栅化扫描线
      * @param v0
      * @param v1
      * @param y
      */
-    public void drawScanline(VertexOut v0, VertexOut v1, int y) {
-        int x0 = (int) Math.ceil(v0.fragCoord.x);
+    public void rasterizeScanline(VertexOut v0, VertexOut v1, int y) {
+        int x0 = (int) Math.ceil(v0.position.x);
         // 按照DirectX和OpenGL的光栅化规则，舍弃右下的顶点。
-        int x1 = (int) Math.floor(v1.fragCoord.x);
+        int x1 = (int) Math.floor(v1.position.x);
         
         for (int x = x0; x <= x1; x++) {
             if (x < 0 || x >= width)
                 continue;
-            // 线性插值
-            float t = (x - v0.fragCoord.x) / (v1.fragCoord.x - v0.fragCoord.x);
             
+            // 线性插值
+            // FIXME 需要透视校正
+            float t = (x - v0.position.x) / (v1.position.x - v0.position.x);
             VertexOut frag = new VertexOut();
             frag.interpolateLocal(v0, v1, t);
             
-            fragmentShader(frag);
+            rasterizePoint(x, y, frag);
         }
     }
     
     /**
-     * 画线
-     * 
-     * @param yIndex 
+     * 光栅化线段，使用Bresenham算法。
      */
-    public void drawLineBresenham(VertexOut v0, VertexOut v1) {
-        int x = (int) v0.fragCoord.x;
-        int y = (int) v0.fragCoord.y;
+    public void rasterizeLine(VertexOut v0, VertexOut v1) {
+        int x = (int) v0.position.x;
+        int y = (int) v0.position.y;
 
-        int w = (int) (v1.fragCoord.x - v0.fragCoord.x);
-        int h = (int) (v1.fragCoord.y - v0.fragCoord.y);
+        int w = (int) (v1.position.x - v0.position.x);
+        int h = (int) (v1.position.y - v0.position.y);
 
-        Vector4f c0 = v0.fragColor;
-        Vector4f c1 = v1.fragColor;
-        Vector4f color = new Vector4f();
-        
         int dx1 = w < 0 ? -1 : (w > 0 ? 1 : 0);
         int dy1 = h < 0 ? -1 : (h > 0 ? 1 : 0);
 
@@ -251,10 +226,12 @@ public class RenderContext extends ImageRaster {
         int numerator = fastStep >> 1;
 
         for (int i = 0; i <= fastStep; i++) {
-            // 颜色线性插值
-            color.interpolateLocal(c0, c1, (float)i/(fastStep-1));
+            // 线性插值
+            float t = (y - v0.position.y) / (v1.position.y - v0.position.y);
+            VertexOut frag = new VertexOut();
+            frag.interpolateLocal(v0, v1, t);
+            rasterizePoint(x, y, frag);
             
-            drawFragment(x, y, color);
             numerator += slowStep;
             if (numerator >= fastStep) {
                 numerator -= fastStep;
@@ -264,7 +241,24 @@ public class RenderContext extends ImageRaster {
                 x += dx2;
                 y += dy2;
             }
-            drawFragment(x, y, color);
+            
+            // 线性插值
+            t = (y - v0.position.y) / (v1.position.y - v0.position.y);
+            frag = new VertexOut();
+            frag.interpolateLocal(v0, v1, t);
+            
+            rasterizePoint(x, y, frag);
+        }
+    }
+    
+    /**
+     * 片段着色器
+     * @param frag
+     */
+    private void fragmentShader(VertexOut frag) {
+        if (texture != null && frag.hasTexCoord) {
+            Vector4f texColor = texture.sample2d(frag.texCoord);
+            frag.color.multLocal(texColor);
         }
     }
 }

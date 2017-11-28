@@ -354,6 +354,14 @@ public final class Vector4f {
         return this;
     }
 
+    public Vector4f set(Vector3f v, float w) {
+        this.x = v.x;
+        this.y = v.y;
+        this.z = v.z;
+        this.w = w;
+        return this;
+    }
+    
     public Vector4f set(Vector4f v) {
         this.x = v.x;
         this.y = v.y;

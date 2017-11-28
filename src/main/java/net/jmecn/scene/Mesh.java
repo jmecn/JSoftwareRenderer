@@ -8,6 +8,7 @@ import net.jmecn.math.Vector2f;
 import net.jmecn.math.Vector3f;
 import net.jmecn.math.Vector4f;
 import net.jmecn.renderer.ImageRaster;
+import net.jmecn.renderer.Vertex;
 
 /**
  * 定义三角形网格

@@ -9,7 +9,7 @@ import java.awt.event.MouseMotionListener;
 import net.jmecn.math.Vector2f;
 
 /**
- * 按键输入
+ * 用户输入
  * 
  * @author yanmaoyuan
  *
