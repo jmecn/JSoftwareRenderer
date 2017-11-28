@@ -48,6 +48,8 @@ public class Screen {
 
         input = new Input();
         canvas.addKeyListener(input);
+        canvas.addMouseListener(input);
+        canvas.addMouseMotionListener(input);
         
         // 创建主窗口
         frame = new JFrame();

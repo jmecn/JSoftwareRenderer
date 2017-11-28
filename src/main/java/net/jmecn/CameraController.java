@@ -1,7 +1,9 @@
 package net.jmecn;
 
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseEvent;
 
+import net.jmecn.math.Vector2f;
 import net.jmecn.math.Vector3f;
 import net.jmecn.renderer.Camera;
 
@@ -30,7 +32,46 @@ public class CameraController {
     }
     
     public void update(float delta) {
+        // 鼠标拖拽旋转摄像机
+        dragRotate(delta);
+
+        // 按键旋转摄像机
+        keyRotate(delta);
         
+        // 按键移动摄像机
+        keyMove(delta);
+    }
+    
+    private Vector2f last;
+    private Vector2f cur = new Vector2f();
+    private Vector2f dxy = new Vector2f();
+    private void dragRotate(float delta) {
+        if (input.getMouseButton(MouseEvent.BUTTON1)) {
+            
+            // 首次按键
+            if (last == null) {
+                last = new Vector2f(input.getStart());
+                cur.set(input.getStart());
+            }
+            cur.set(input.getStop());
+            dxy = cur.subtract(last, dxy);
+        } else {
+            last = null;
+            dxy.set(0, 0);
+            cur.set(0, 0);
+        }
+        
+        if (last != null && dxy.lengthSquared() > 0) {
+            camera.rotate(-dxy.y*0.005f, -dxy.x*0.005f, 0);
+            last.set(cur);
+        }
+    }
+    
+    /**
+     * 按键旋转
+     * @param delta
+     */
+    private void keyRotate(float delta) {
         // 左右旋转
         if (input.getKey(KeyEvent.VK_LEFT)) {
             camera.rotate(0, delta, 0);
@@ -45,6 +86,12 @@ public class CameraController {
             camera.rotate(-delta, 0, 0);
         }
         
+    }
+    /**
+     * QWASDZ移动
+     * @param delta
+     */
+    private void keyMove(float delta) {
         boolean changed = false;
         step.set(0, 0, 0);
         

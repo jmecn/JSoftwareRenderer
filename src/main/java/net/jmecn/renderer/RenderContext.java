@@ -97,31 +97,18 @@ public class RenderContext extends ImageRaster {
      * @param v2 底边右顶点
      */
     private void fillBottomLineTriangle(Vertex v0, Vertex v1, Vertex v2) {
-        int y0 = (int) (v0.fragCoord.y + 0.5f);
-        int y2 = (int) (v2.fragCoord.y + 0.5f);
+        int y0 = (int) Math.ceil(v0.fragCoord.y);
+        int y2 = (int) Math.ceil(v2.fragCoord.y);
         
-        // 左边线的斜率
-        float dyl = (v1.fragCoord.x - v0.fragCoord.x) / (v1.fragCoord.y - v0.fragCoord.y);
-        // 右边线的斜率
-        float dyr = (v2.fragCoord.x - v0.fragCoord.x) / (v2.fragCoord.y - v0.fragCoord.y);
-        
-        for (int y = y0; y <= y2; y++) {
+        for (int y = y0; y <y2; y++) {
             int yIndex = (int)(Math.round(y)); 
             if (yIndex >= 0 && yIndex < this.height) {
-                float xl = (y - v0.fragCoord.y) * dyl + v0.fragCoord.x + 0.5f;
-                float xr = (y - v0.fragCoord.y) * dyr + v0.fragCoord.x + 0.5f;
-
                 float dy = y - v0.fragCoord.y;
                 float t = dy / (v1.fragCoord.y - v0.fragCoord.y);
                 //插值生成左右顶点
                 Vertex vl = new Vertex();
-                vl.fragCoord.x = xl;
-                vl.fragCoord.y = y;
                 vl.interpolateLocal(v0, v1, t);
-                //
                 Vertex vr = new Vertex();
-                vr.fragCoord.x = xr;
-                vr.fragCoord.y = y;
                 vr.interpolateLocal(v0, v2, t);
                 //扫描线填充
                 drawScanline(vl, vr, y);
@@ -136,31 +123,20 @@ public class RenderContext extends ImageRaster {
      * @param v2 下顶点
      */
     private void fillTopLineTriangle(Vertex v0, Vertex v1, Vertex v2) {
-        int y0 = (int) (v0.fragCoord.y + 0.5f);
-        int y2 = (int) (v2.fragCoord.y + 0.5f);
+        int y0 = (int) Math.ceil(v0.fragCoord.y);
+        int y2 = (int) Math.ceil(v2.fragCoord.y);
 
-        // 左边线的斜率
-        float dyl = (v2.fragCoord.x - v0.fragCoord.x) / (v2.fragCoord.y - v0.fragCoord.y);
-        // 右边线的斜率
-        float dyr = (v2.fragCoord.x - v1.fragCoord.x) / (v2.fragCoord.y - v1.fragCoord.y);
-        
-        for (int y = y0; y <= y2; y++) {
+        for (int y = y0; y < y2; y++) {
             if (y >= 0 && y < this.height) {
-                float xl = (y - v0.fragCoord.y) * dyl + v0.fragCoord.x + 0.5f;
-                float xr = (y - v1.fragCoord.y) * dyr + v1.fragCoord.x + 0.5f;
 
                 float dy = y - v0.fragCoord.y;
                 float t = dy / (v2.fragCoord.y - v0.fragCoord.y);
                 //插值生成左右顶点
                 Vertex vl = new Vertex();
                 vl.interpolateLocal(v0, v2, t);
-                vl.fragCoord.x = xl;
-                vl.fragCoord.y = y;
-                //
                 Vertex vr = new Vertex();
                 vr.interpolateLocal(v1, v2, t);
-                vr.fragCoord.x = xr;
-                vr.fragCoord.y = y;
+                
                 //扫描线填充
                 drawScanline(vl, vr, y);
             }
@@ -168,19 +144,20 @@ public class RenderContext extends ImageRaster {
     }
     
     public void drawScanline(Vertex v0, Vertex v1, int yIndex) {
-        int x = (int) (v0.fragCoord.x + 0.5f);
-        int y = (int) (v0.fragCoord.y + 0.5f);
+        int x0 = (int) Math.ceil(v0.fragCoord.x);
+        int y = yIndex;
         
-        int w = (int) (v1.fragCoord.x - v0.fragCoord.x);
+        int x1 = (int) Math.round(v1.fragCoord.x);
         
         Vector4f c0 = v0.fragColor;
         Vector4f c1 = v1.fragColor;
         Vector4f color = new Vector4f();
         
-        for (int i = 0; i <= w; i++) {
+        for (int x = x0; x <= x1; x++) {
+            float t = (x - v0.fragCoord.x) / (v1.fragCoord.x - v0.fragCoord.x);
             // 颜色线性插值
-            color.interpolateLocal(c0, c1, (float)i/(w-1));
-            drawPixel(x+i, y, color);
+            color.interpolateLocal(c0, c1, t);
+            drawPixel(x, y, color);
         }
     }
     

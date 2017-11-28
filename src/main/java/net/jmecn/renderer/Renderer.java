@@ -162,6 +162,15 @@ public class Renderer {
             vertexShader(v1);
             vertexShader(v2);
 
+            v0.fragCoord.multLocal(1f / v0.fragCoord.w); // 透视除法
+            v1.fragCoord.multLocal(1f / v1.fragCoord.w); // 透视除法
+            v2.fragCoord.multLocal(1f / v2.fragCoord.w); // 透视除法
+            
+            // 把顶点位置修正到屏幕空间。
+            viewportMatrix.mult(v0.fragCoord, v0.fragCoord);
+            viewportMatrix.mult(v1.fragCoord, v1.fragCoord);
+            viewportMatrix.mult(v2.fragCoord, v2.fragCoord);
+            
             if (mesh.isWireframe()) {
                 imageRaster.drawTriangle(v0, v1, v2);
             } else {
@@ -195,11 +204,7 @@ public class Renderer {
     protected void vertexShader(Vertex vert) {
         // 模型-观察-透视 变换
         worldViewProjectionMatrix.mult(new Vector4f(vert.position, 1), vert.fragCoord);
-        vert.fragCoord.multLocal(1f / vert.fragCoord.w); // 透视除法
-        
-        // 把顶点位置修正到屏幕空间。
-        viewportMatrix.mult(vert.fragCoord, vert.fragCoord);
-        
+
         // 设置顶点颜色
         if (vert.color == null) {
             vert.fragColor.set(1, 1, 1, 1);

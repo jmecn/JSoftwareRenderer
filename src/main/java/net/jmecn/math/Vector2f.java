@@ -76,6 +76,21 @@ public final class Vector2f {
     /**
      * 向量减法
      * @param v
+     * @param result
+     * @return
+     */
+    public Vector2f subtract(Vector2f v, Vector2f result) {
+        if (result == null)
+            result = new Vector2f();
+        
+        result.x = x - v.x;
+        result.y = y - v.y;
+        return result;
+    }
+    
+    /**
+     * 向量减法
+     * @param v
      * @return
      */
     public Vector2f subtractLocal(Vector2f v) {
