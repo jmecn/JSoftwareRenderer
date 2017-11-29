@@ -131,6 +131,8 @@ public class Renderer {
         // 获取所有物体
         List<Geometry> geomList = scene.getGeometryList(null);
         
+        // TODO 剔除那些不可见的物体
+        
         // 遍历场景中的Mesh
         for(int i=0; i<geomList.size(); i++) {
             Geometry geom = geomList.get(i);
@@ -140,7 +142,7 @@ public class Renderer {
             viewMatrix.mult(worldMatrix, worldViewMatrix);
             viewProjectionMatrix.mult(worldMatrix, worldViewProjectionMatrix);
             
-            // TODO 剔除不可见的Mesh
+            // TODO 使用包围体，剔除不可见物体
             
             // 渲染
             render(geom);
@@ -163,16 +165,22 @@ public class Renderer {
         Vector3f b = new Vector3f();
         Vector3f c = new Vector3f();
         
-        // 遍历所有三角形
+        // 提取网格数据
         Mesh mesh = geometry.getMesh();
         int[] indexes = mesh.getIndexes();
         Vertex[] vertexes = mesh.getVertexes();
         
+        // 遍历所有三角形
         for (int i = 0; i < indexes.length; i += 3) {
 
             Vertex v0 = vertexes[indexes[i]];
             Vertex v1 = vertexes[indexes[i+1]];
             Vertex v2 = vertexes[indexes[i+2]];
+            
+            // 执行顶点着色器
+            RasterizationVertex out0 = vertexShader(v0);
+            RasterizationVertex out1 = vertexShader(v1);
+            RasterizationVertex out2 = vertexShader(v2);
             
             // 在观察空间进行背面消隐
             worldViewMatrix.mult(v0.position, a);
@@ -182,15 +190,9 @@ public class Renderer {
             if (cullBackFace(a, b, c))
                 continue;
 
-            // 执行顶点着色器
-            RasterizationVertex out0 = vertexShader(v0);
-            RasterizationVertex out1 = vertexShader(v1);
-            RasterizationVertex out2 = vertexShader(v2);
-
             // TODO 视锥裁剪
             
             
-            // x,y,z除以w
             out0.perspectiveDivide();
             out1.perspectiveDivide();
             out2.perspectiveDivide();

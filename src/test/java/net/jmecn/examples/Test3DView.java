@@ -66,9 +66,9 @@ public class Test3DView extends Application {
         // 不裁剪背面
         renderState.setFaceCullMode(FaceCullMode.NEVER);
         
-        // 显示为黄色线框
+        // 显示为白色线框
         renderState.setWireframe(true);
-        renderState.setWireframeColor(new Vector4f(1, 1, 0, 1));
+        renderState.setWireframeColor(new Vector4f(1, 1, 1, 1));
         
         // 添加到场景中
         this.geom = new Geometry(mesh, material);
