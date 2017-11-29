@@ -1,6 +1,7 @@
 package net.jmecn.scene;
 
 import net.jmecn.geom.Drawable;
+import net.jmecn.material.Material;
 import net.jmecn.math.ColorRGBA;
 import net.jmecn.math.Matrix4f;
 import net.jmecn.math.Transform;
@@ -8,8 +9,6 @@ import net.jmecn.math.Vector2f;
 import net.jmecn.math.Vector3f;
 import net.jmecn.math.Vector4f;
 import net.jmecn.renderer.ImageRaster;
-import net.jmecn.renderer.Material;
-import net.jmecn.renderer.Vertex;
 
 /**
  * 定义三角形网格

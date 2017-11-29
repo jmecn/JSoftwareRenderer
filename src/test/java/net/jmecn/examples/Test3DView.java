@@ -1,12 +1,12 @@
 package net.jmecn.examples;
 
 import net.jmecn.Application;
+import net.jmecn.material.Material;
+import net.jmecn.material.RenderState;
+import net.jmecn.material.RenderState.FaceCullMode;
 import net.jmecn.math.Vector3f;
 import net.jmecn.math.Vector4f;
 import net.jmecn.renderer.Camera;
-import net.jmecn.renderer.Material;
-import net.jmecn.renderer.RenderState;
-import net.jmecn.renderer.RenderState.FaceCullMode;
 import net.jmecn.scene.Mesh;
 
 /**

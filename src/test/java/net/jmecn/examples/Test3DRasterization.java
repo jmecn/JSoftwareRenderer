@@ -1,10 +1,10 @@
 package net.jmecn.examples;
 
 import net.jmecn.Application;
+import net.jmecn.material.Material;
 import net.jmecn.math.Vector3f;
-import net.jmecn.renderer.Material;
-import net.jmecn.scene.Box;
 import net.jmecn.scene.Mesh;
+import net.jmecn.scene.shape.Box;
 
 /**
  * 测试3D光栅化

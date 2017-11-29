@@ -1,4 +1,4 @@
-package net.jmecn.renderer;
+package net.jmecn.scene;
 
 import net.jmecn.math.Vector2f;
 import net.jmecn.math.Vector3f;

@@ -1,4 +1,4 @@
-package net.jmecn.scene;
+package net.jmecn.material;
 
 import net.jmecn.math.ColorRGBA;
 import net.jmecn.math.Vector2f;

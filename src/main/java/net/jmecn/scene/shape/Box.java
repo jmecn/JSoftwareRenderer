@@ -1,9 +1,10 @@
-package net.jmecn.scene;
+package net.jmecn.scene.shape;
 
 import net.jmecn.math.Vector2f;
 import net.jmecn.math.Vector3f;
 import net.jmecn.math.Vector4f;
-import net.jmecn.renderer.Vertex;
+import net.jmecn.scene.Mesh;
+import net.jmecn.scene.Vertex;
 
 /**
  * 一个立方体

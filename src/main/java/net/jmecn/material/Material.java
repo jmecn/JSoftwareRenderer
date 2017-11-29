@@ -1,6 +1,4 @@
-package net.jmecn.renderer;
-
-import net.jmecn.scene.Texture;
+package net.jmecn.material;
 
 /**
  * 材质

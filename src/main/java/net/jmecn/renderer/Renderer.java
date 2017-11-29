@@ -2,12 +2,15 @@ package net.jmecn.renderer;
 
 import java.util.List;
 
+import net.jmecn.material.Material;
+import net.jmecn.material.RenderState.FaceCullMode;
 import net.jmecn.math.ColorRGBA;
 import net.jmecn.math.Matrix4f;
 import net.jmecn.math.Vector3f;
 import net.jmecn.math.Vector4f;
-import net.jmecn.renderer.RenderState.FaceCullMode;
 import net.jmecn.scene.Mesh;
+import net.jmecn.scene.Vertex;
+import net.jmecn.scene.VertexOut;
 
 /**
  * 渲染器

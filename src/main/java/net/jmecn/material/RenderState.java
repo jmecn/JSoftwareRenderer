@@ -1,4 +1,4 @@
-package net.jmecn.renderer;
+package net.jmecn.material;
 
 import net.jmecn.math.Vector4f;
 
@@ -29,6 +29,9 @@ public class RenderState {
 
     private FaceCullMode faceCullMode;
     
+    private boolean isAlphaTest;
+    private float alphaFalloff;
+    
     private DepthMode depthMode;
     private boolean isDepthTest;
     private boolean isDepthWrite;
@@ -40,6 +43,9 @@ public class RenderState {
         wireframeColor = new Vector4f(0, 1, 0, 1);
         
         faceCullMode = FaceCullMode.BACK;
+        
+        isAlphaTest = false;
+        alphaFalloff = 0f;
         
         depthMode = DepthMode.LESS;
         isDepthTest = true;
@@ -70,6 +76,22 @@ public class RenderState {
 
     public void setFaceCullMode(FaceCullMode faceCullMode) {
         this.faceCullMode = faceCullMode;
+    }
+
+    public boolean isAlphaTest() {
+        return isAlphaTest;
+    }
+
+    public void setAlphaTest(boolean isAlphaTest) {
+        this.isAlphaTest = isAlphaTest;
+    }
+
+    public float getAlphaFalloff() {
+        return alphaFalloff;
+    }
+
+    public void setAlphaFalloff(float alphaFalloff) {
+        this.alphaFalloff = alphaFalloff;
     }
 
     public DepthMode getDepthMode() {

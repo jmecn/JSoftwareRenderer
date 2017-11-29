@@ -1,8 +1,10 @@
 package net.jmecn.renderer;
 
+import net.jmecn.material.RenderState;
+import net.jmecn.material.Texture;
 import net.jmecn.math.Matrix4f;
 import net.jmecn.math.Vector4f;
-import net.jmecn.scene.Texture;
+import net.jmecn.scene.VertexOut;
 
 /**
  * 顶点光栅器
@@ -53,6 +55,13 @@ public class VertexRaster extends ImageRaster {
 
         int index = x + y * width;
         
+        
+        // ALPHA测试
+        if (renderState.isAlphaTest()) {
+            if (frag.color.w < renderState.getAlphaFalloff())
+                return;
+        }
+        
         float depth = frag.position.z;
         
         // 深度测试
@@ -65,9 +74,8 @@ public class VertexRaster extends ImageRaster {
             depthBuffer[index] = depth;
         }
         
-        Vector4f srcColor = frag.color;
-        
         // BLEND混色
+        Vector4f srcColor = frag.color;
         Vector4f destColor = getColor(x, y);
         
         switch (renderState.getBlendMode()) {
