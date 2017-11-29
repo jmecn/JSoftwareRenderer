@@ -17,11 +17,20 @@ import net.jmecn.renderer.ImageRaster;
  *
  */
 public class Mesh implements Drawable {
+    /**
+     * 顶点数据
+     */
     protected Vertex[] vertexes;
+    /**
+     * 顶点索引
+     */
     protected int[] indexes;
-    
+
+    /**
+     * 材质
+     */
     protected Material material;
-    
+
     /**
      * 空间变换
      */
