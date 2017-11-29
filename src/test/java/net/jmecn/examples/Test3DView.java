@@ -3,9 +3,9 @@ package net.jmecn.examples;
 import net.jmecn.Application;
 import net.jmecn.material.Material;
 import net.jmecn.material.RenderState;
-import net.jmecn.material.RenderState.FaceCullMode;
+import net.jmecn.material.RenderState.CullMode;
+import net.jmecn.material.RenderState.FillMode;
 import net.jmecn.math.Vector3f;
-import net.jmecn.math.Vector4f;
 import net.jmecn.renderer.Camera;
 import net.jmecn.scene.Geometry;
 import net.jmecn.scene.Mesh;
@@ -43,11 +43,10 @@ public class Test3DView extends Application {
         RenderState renderState = material.getRenderState();
 
         // 不裁剪背面
-        renderState.setFaceCullMode(FaceCullMode.NEVER);
+        renderState.setCullMode(CullMode.NEVER);
         
-        // 显示为白色线框
-        renderState.setWireframe(true);
-        renderState.setWireframeColor(new Vector4f(1, 1, 1, 1));
+        // 显示为线框
+        renderState.setFillMode(FillMode.WIREFRAME);
         
         // 添加到场景中
         this.geom = new Geometry(mesh, material);
@@ -55,7 +54,7 @@ public class Test3DView extends Application {
         
         // 调整摄像机的位置
         Camera cam = getCamera();
-        cam.lookAt(new Vector3f(3, 4, 8), Vector3f.ZERO, Vector3f.UNIT_Y);
+        cam.lookAt(new Vector3f(2, 3, 5), Vector3f.ZERO, Vector3f.UNIT_Y);
     }
 
     @Override
@@ -69,7 +68,7 @@ public class Test3DView extends Application {
         }
         
         // 计算旋转：绕Z轴顺时针方向旋转
-        geom.getLocalTransform().getRotation().fromAxisAngle(Vector3f.UNIT_Y, -angle);
+        //geom.getLocalTransform().getRotation().fromAxisAngle(Vector3f.UNIT_Y, -angle);
     }
 
 }

@@ -2,7 +2,7 @@ package net.jmecn.examples;
 
 import net.jmecn.Application;
 import net.jmecn.material.Material;
-import net.jmecn.material.RenderState.FaceCullMode;
+import net.jmecn.material.RenderState.CullMode;
 import net.jmecn.material.Texture;
 import net.jmecn.math.Vector3f;
 import net.jmecn.scene.Geometry;
@@ -37,7 +37,7 @@ public class Test3DAlphaTest extends Application {
         material.setTexture(texture);
 
         // 不裁剪，这样我们就能看到立方体的内部。
-        material.getRenderState().setFaceCullMode(FaceCullMode.NEVER);
+        material.getRenderState().setCullMode(CullMode.NEVER);
         
         // 开启Alpha测试
         material.getRenderState().setAlphaTest(true);

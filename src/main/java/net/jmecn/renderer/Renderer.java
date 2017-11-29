@@ -3,11 +3,10 @@ package net.jmecn.renderer;
 import java.util.List;
 
 import net.jmecn.material.Material;
-import net.jmecn.material.RenderState.FaceCullMode;
+import net.jmecn.material.RenderState.CullMode;
 import net.jmecn.math.ColorRGBA;
 import net.jmecn.math.Matrix4f;
 import net.jmecn.math.Vector3f;
-import net.jmecn.math.Vector4f;
 import net.jmecn.scene.Geometry;
 import net.jmecn.scene.Mesh;
 import net.jmecn.scene.RasterizationVertex;
@@ -213,7 +212,7 @@ public class Renderer {
         
         float dot = faceNormal.dot(c);
 
-        FaceCullMode cullMode = material.getRenderState().getFaceCullMode();
+        CullMode cullMode = material.getRenderState().getCullMode();
         switch (cullMode) {
         case NEVER:
             return false;
@@ -251,15 +250,6 @@ public class Renderer {
         if (vert.color != null) {
             out.color.set(vert.color);
             out.hasVertexColor = true;
-        }
-        
-        // 线框颜色
-        if (material.getRenderState().isWireframe()) {
-            Vector4f color = material.getRenderState().getWireframeColor();
-            if (color != null) {
-                out.color.set(color);
-                out.hasVertexColor = true;
-            }
         }
         
         // 顶点着色器

@@ -10,24 +10,42 @@ import net.jmecn.math.Vector4f;
  */
 public class RenderState {
 
-    public enum FaceCullMode {
+    /**
+     * 剔除模式
+     */
+    public enum CullMode {
         NEVER, FACE, BACK, ALWAYS
     }
 
-    public  enum DepthMode {
+    /**
+     * 深度测试模式
+     */
+    public enum DepthMode {
         ALWAYS, LESS, LESS_EQUAL, GREATER, GREATER_EQUAL, EQUAL, NOT_EQUAL
     }
 
+    /**
+     * 混色模式
+     */
     public enum BlendMode {
         OPACITY, // 实心
         ADD, // 叠加
         ALPHA_BLEND// ALPHA混合
     }
 
-    private boolean isWireframe;
-    private Vector4f wireframeColor;
+    /**
+     * 填充模式
+     */
+    public enum FillMode {
+        POINT,// 点填充模式，在每个顶点绘制一个像素
+        WIREFRAME,// 线框模式，在每个边绘制一条直线
+        SOLID,// 实心模式，对每个面进行填充
+    }
 
-    private FaceCullMode faceCullMode;
+    private CullMode cullMode;
+    
+    private FillMode fillMode;
+    private Vector4f wireframeColor;
     
     private boolean isAlphaTest;
     private float alphaFalloff;
@@ -39,10 +57,9 @@ public class RenderState {
     private BlendMode blendMode;
 
     public RenderState() {
-        isWireframe = false;
-        wireframeColor = null;
+        fillMode = FillMode.SOLID;
         
-        faceCullMode = FaceCullMode.BACK;
+        cullMode = CullMode.BACK;
         
         isAlphaTest = false;
         alphaFalloff = 0f;
@@ -54,13 +71,15 @@ public class RenderState {
         blendMode = BlendMode.OPACITY;
     }
 
-    public boolean isWireframe() {
-        return isWireframe;
+    public FillMode getFillMode() {
+        return fillMode;
     }
 
-    public void setWireframe(boolean isWireframe) {
-        this.isWireframe = isWireframe;
+
+    public void setFillMode(FillMode fillMode) {
+        this.fillMode = fillMode;
     }
+
 
     public Vector4f getWireframeColor() {
         return wireframeColor;
@@ -70,12 +89,12 @@ public class RenderState {
         this.wireframeColor.set(color);
     }
 
-    public FaceCullMode getFaceCullMode() {
-        return faceCullMode;
+    public CullMode getCullMode() {
+        return cullMode;
     }
 
-    public void setFaceCullMode(FaceCullMode faceCullMode) {
-        this.faceCullMode = faceCullMode;
+    public void setCullMode(CullMode faceCullMode) {
+        this.cullMode = faceCullMode;
     }
 
     public boolean isAlphaTest() {

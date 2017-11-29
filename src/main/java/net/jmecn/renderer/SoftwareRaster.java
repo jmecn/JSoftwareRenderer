@@ -175,59 +175,70 @@ public class SoftwareRaster extends ImageRaster {
         viewportMatrix.mult(v1.position, v1.position);
         viewportMatrix.mult(v2.position, v2.position);
 
-        if (renderState.isWireframe()) {
+        switch (renderState.getFillMode()) {
+        case POINT: {
+            rasterizePixel((int)v0.position.x, (int)v0.position.y, v0);
+            rasterizePixel((int)v1.position.x, (int)v1.position.y, v1);
+            rasterizePixel((int)v2.position.x, (int)v2.position.y, v2);
+            return;
+        }
+        case WIREFRAME : {
             rasterizeLine(v0, v1);
             rasterizeLine(v0, v2);
             rasterizeLine(v1, v2);
             return;
         }
-        
-        // 按Y坐标把三个顶点从上到下冒泡排序
-        RasterizationVertex tmp;
-        if (v0.position.y > v1.position.y) {
-            tmp = v0;
-            v0 = v1;
-            v1 = tmp;
-        }
-        if (v1.position.y > v2.position.y) {
-            tmp = v1;
-            v1 = v2;
-            v2 = tmp;
-        }
-        if (v0.position.y > v1.position.y) {
-            tmp = v0;
-            v0 = v1;
-            v1 = tmp;
-        }
-        
-        float y0 = v0.position.y;
-        float y1 = v1.position.y;
-        float y2 = v2.position.y;
-        
-        if (y0 == y1) {// 平顶
-            fillTopLineTriangle(v0, v1, v2);
-        } else if (y1 == y2) {// 平底
-            fillBottomLineTriangle(v0, v1, v2);
-        } else {// 分割三角形
-            
-            // 线性插值
-            // FIXME 需要透视校正
-            float t = (y1 - y0) / (y2 - y0);
-            RasterizationVertex middleVert = new RasterizationVertex();
-            middleVert.interpolateLocal(v0, v2, t);
-            
-            if (middleVert.position.x <= v1.position.x)  {// 左三角形
-                // 画平底
-                fillBottomLineTriangle(v0, middleVert, v1);
-                // 画平顶
-                fillTopLineTriangle(middleVert, v1, v2);
-            } else {// 右三角形
-                // 画平底
-                fillBottomLineTriangle(v0, v1, middleVert);
-                // 画平顶
-                fillTopLineTriangle(v1, middleVert, v2);
+        case SOLID : {
+            // 按Y坐标把三个顶点从上到下冒泡排序
+            RasterizationVertex tmp;
+            if (v0.position.y > v1.position.y) {
+                tmp = v0;
+                v0 = v1;
+                v1 = tmp;
             }
+            if (v1.position.y > v2.position.y) {
+                tmp = v1;
+                v1 = v2;
+                v2 = tmp;
+            }
+            if (v0.position.y > v1.position.y) {
+                tmp = v0;
+                v0 = v1;
+                v1 = tmp;
+            }
+            
+            float y0 = v0.position.y;
+            float y1 = v1.position.y;
+            float y2 = v2.position.y;
+            
+            if (y0 == y1) {// 平顶
+                fillTopLineTriangle(v0, v1, v2);
+            } else if (y1 == y2) {// 平底
+                fillBottomLineTriangle(v0, v1, v2);
+            } else {// 分割三角形
+                
+                // 线性插值
+                // FIXME 需要透视校正
+                float t = (y1 - y0) / (y2 - y0);
+                RasterizationVertex middleVert = new RasterizationVertex();
+                middleVert.interpolateLocal(v0, v2, t);
+                
+                if (middleVert.position.x <= v1.position.x)  {// 左三角形
+                    // 画平底
+                    fillBottomLineTriangle(v0, middleVert, v1);
+                    // 画平顶
+                    fillTopLineTriangle(middleVert, v1, v2);
+                } else {// 右三角形
+                    // 画平底
+                    fillBottomLineTriangle(v0, v1, middleVert);
+                    // 画平顶
+                    fillTopLineTriangle(v1, middleVert, v2);
+                }
+            }
+            return;
         }
+        }
+        
     }
 
     /**
