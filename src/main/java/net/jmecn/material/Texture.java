@@ -18,10 +18,36 @@ public class Texture {
     private int height;
     private byte[] components;
 
-    boolean isLinearFilter = false;
-    public void setLinearFilter(boolean isLinearFilter) {
-        this.isLinearFilter = isLinearFilter;
+    /**
+     * 纹理放大时，如何滤波
+     */
+    public enum MagFilter {
+        NEAREST,    // 最邻近
+        BILINEAR,   // 二次线性滤波
     }
+    
+    private MagFilter magFilter = MagFilter.BILINEAR;
+    
+    /**
+     * 纹理包围模式
+     */
+    public enum WarpMode {
+        REPEAT,             // 纹理的默认行为。重复纹理图像。
+        MIRRORED_REPEAT,    // 和REPEAT一样，除了重复的图片是镜像放置的。
+        CLAMP_TO_EDGE,      // 纹理坐标会在0到1之间。超出的部分会重复纹理坐标的边缘，就是边缘被拉伸。
+        CLAMP_TO_BORDER     // 超出的部分是用户指定的边缘的颜色。
+    }
+
+    /**
+     * 指定包围模式属于哪个轴
+     */
+    public enum WarpAxis {
+        S, T
+    }
+    
+    private WarpMode warpS = WarpMode.REPEAT;
+    private WarpMode warpT = WarpMode.REPEAT;
+    private Vector4f borderColor = new Vector4f(0);
     
     /**
      * 默认纹理，生成一个网格黑白相间的网格。
@@ -54,6 +80,10 @@ public class Texture {
         setImage(image);
     }
 
+    /**
+     * 设置图像
+     * @param image
+     */
     public void setImage(Image image) {
         this.width = image.getWidth();
         this.height = image.getHeight();
@@ -61,26 +91,133 @@ public class Texture {
     }
 
     /**
+     * 设置放大滤波方式
+     * @param magFilter
+     */
+    public void setMagFilter(MagFilter magFilter) {
+        this.magFilter = magFilter;
+    }
+
+    /**
+     * 设置纹理包裹模式
+     * @param mode
+     */
+    public void setWarpMode(WarpMode mode) {
+        warpS = mode;
+        warpT = mode;
+    }
+    
+    /**
+     * 设置纹理包裹模式
+     * @param axis
+     * @param mode
+     */
+    public void setWarpMode(WarpAxis axis, WarpMode mode) {
+        switch (axis){
+        case S:
+            warpS = mode;
+            break;
+        case T:
+            warpT = mode;
+        }
+    }
+    
+    /**
      * 根据UV进行采样
      * 
      * @param uv
      * @return
      */
     public Vector4f sample2d(Vector2f uv) {
-        if (isLinearFilter)
-            return linear(uv.x, uv.y);
-        else
-            return nearest(uv.x, uv.y);
+        float s = uv.x;
+        float t = uv.y;
+        
+        if (s < 0 || s > 1 || t < 0 || t > 1) {
+            if (warpS == WarpMode.CLAMP_TO_BORDER || warpT == WarpMode.CLAMP_TO_BORDER) {
+                return borderColor;
+            }
+            
+            s = warp(s, warpS);
+            t = warp(t, warpT);
+        }
+        
+        switch (magFilter) {
+        case NEAREST:
+            return nearest(s, t);
+        case BILINEAR:
+            return bilinear(s, t);
+        }
+        
+        return new Vector4f(0);
+    }
+    
+    /**
+     * 设置边框颜色
+     * @param borderColor
+     */
+    public void setBorderColor(Vector4f borderColor) {
+        this.borderColor = borderColor;
     }
 
     /**
-     * 线性采样
+     * 纹理坐标包裹
+     * @param value
+     * @param mode
+     * @return
+     */
+    private float warp(float value, WarpMode mode) {
+        switch (mode) {
+        case REPEAT: {
+            // 整数部分
+            int n = (int) value;
+            // 小数部分
+            float frac = value - n;
+            
+            if (frac < 0) {
+                frac = frac + 1f;
+            }
+            value = frac;
+            break;
+        }
+        case MIRRORED_REPEAT: {
+            // 整数部分
+            int n = (int) value;
+            // 小数部分
+            float frac = value - n;
+            
+            if (frac < 0) {
+                frac = - frac;
+            }
+            
+            if (n % 2 != 0) {
+                frac = 1 - frac;
+            }
+                
+            value = frac;
+            break;
+        }
+        case CLAMP_TO_EDGE:
+            if (value < 0) {
+                value = 0;
+            }
+            if (value > 1) {
+                value = 1;
+            }
+            break;
+        case CLAMP_TO_BORDER:
+            break;
+        }
+        return value;
+    }
+    
+    /**
+     * 二次线性(Bilinear)采样
      * 
      * @param s
      * @param t
      * @return
      */
-    protected Vector4f linear(float s, float t) {
+    protected Vector4f bilinear(float s, float t) {
         // 计算坐标
         float u = (float) (width - 1) * s;
         float v = (float) (height - 1) * (1 - t);
@@ -120,7 +257,7 @@ public class Texture {
     }
 
     /**
-     * 邻近点(NEAREST)采样
+     * 最邻近点(NEAREST)采样
      * 
      * @param s
      * @param t
