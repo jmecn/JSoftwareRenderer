@@ -56,11 +56,6 @@ public class VertexRaster extends ImageRaster {
         int index = x + y * width;
         
         
-        // ALPHA测试
-        if (renderState.isAlphaTest()) {
-            if (frag.color.w < renderState.getAlphaFalloff())
-                return;
-        }
         
         float depth = frag.position.z;
         
@@ -68,12 +63,12 @@ public class VertexRaster extends ImageRaster {
         if (renderState.isDepthTest() && !depthTest(depthBuffer[index], depth)) {
             return;
         }
-
-        // 写入深度缓冲
-        if (renderState.isDepthWrite()) {
-            depthBuffer[index] = depth;
+        // ALPHA测试
+        if (renderState.isAlphaTest()) {
+            if (frag.color.w < renderState.getAlphaFalloff())
+                return;
         }
-        
+
         // BLEND混色
         Vector4f srcColor = frag.color;
         Vector4f destColor = getColor(x, y);
@@ -101,6 +96,11 @@ public class VertexRaster extends ImageRaster {
         destColor.z = clamp(destColor.z, 0, 1);
         destColor.w = clamp(destColor.w, 0, 1);
         
+        // 写入depthBuffer
+        if (renderState.isDepthWrite()) {
+            depthBuffer[index] = depth;
+        }
+        
         // 写入frameBuffer
         index *= 4;
 
@@ -108,6 +108,7 @@ public class VertexRaster extends ImageRaster {
         components[index + 1] = (byte)(destColor.y * 0xFF);
         components[index + 2] = (byte)(destColor.z * 0xFF);
         components[index + 3] = (byte)(destColor.w * 0xFF);
+        
     }
     
     /**
