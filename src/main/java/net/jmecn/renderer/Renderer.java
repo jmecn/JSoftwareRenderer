@@ -223,7 +223,7 @@ public class Renderer {
         case FACE:
             return dot < 0;
         default:
-                return false;
+            return false;
         }
     }
     
