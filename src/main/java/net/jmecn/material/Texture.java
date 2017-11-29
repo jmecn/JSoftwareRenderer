@@ -18,8 +18,6 @@ public class Texture {
     private int height;
     private byte[] components;
 
-    private final static float INV_SCALE = 1f / 255f;
-
     boolean isLinearFilter = false;
     public void setLinearFilter(boolean isLinearFilter) {
         this.isLinearFilter = isLinearFilter;
@@ -30,15 +28,21 @@ public class Texture {
      */
     public Texture() {
         Image image = new Image(64, 64);
+        
+        // 创建一个ImageRaster用来画图。
         ImageRaster raster = new ImageRaster(image);
+        
+        // 底色填充为白色
         raster.fill(ColorRGBA.WHITE);
 
+        // 纯黑
+        ColorRGBA color = new ColorRGBA(0x00000000);
         for (int y = 0; y < 64; y++) {
             for (int x = 0; x < 64; x++) {
                 int i = x / 8;
                 int j = y / 8;
                 if ((i + j) % 2 == 0) {
-                    raster.drawPixel(x, y, ColorRGBA.BLACK_NO_ALPHA);
+                    raster.drawPixel(x, y, color);
                 }
             }
         }
@@ -135,6 +139,8 @@ public class Texture {
         Vector4f color = getColor(iu, iv);
         return color;
     }
+    
+    private final static float INV_SCALE = 1f / 255f;
     
     /**
      * 提取颜色

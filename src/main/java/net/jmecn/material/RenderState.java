@@ -30,8 +30,9 @@ public class RenderState {
     /**
      * 深度测试模式
      */
-    public enum DepthMode {
+    public enum DepthFunc {
         ALWAYS,
+        NEVER,
         LESS,
         LESS_EQUAL,
         GREATER,
@@ -56,7 +57,7 @@ public class RenderState {
     private boolean isAlphaTest;
     private float alphaFalloff;
     
-    private DepthMode depthMode;
+    private DepthFunc depthFunc;
     private boolean isDepthTest;
     private boolean isDepthWrite;
     
@@ -69,7 +70,7 @@ public class RenderState {
         isAlphaTest = false;
         alphaFalloff = 0f;
         
-        depthMode = DepthMode.LESS;
+        depthFunc = DepthFunc.LESS;
         isDepthTest = true;
         isDepthWrite = true;
         
@@ -109,12 +110,12 @@ public class RenderState {
         this.alphaFalloff = alphaFalloff;
     }
 
-    public DepthMode getDepthMode() {
-        return depthMode;
+    public DepthFunc getDepthFunc() {
+        return depthFunc;
     }
 
-    public void setDepthMode(DepthMode depthMode) {
-        this.depthMode = depthMode;
+    public void setDepthFunc(DepthFunc depthFunc) {
+        this.depthFunc = depthFunc;
     }
 
     public boolean isDepthTest() {

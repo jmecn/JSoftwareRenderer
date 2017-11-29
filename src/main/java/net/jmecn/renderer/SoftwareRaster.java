@@ -60,7 +60,7 @@ public class SoftwareRaster extends ImageRaster {
         fragmentShader(frag);
 
         int index = x + y * width;
-        float depth = frag.position.z;
+        float depth = frag.position.z / frag.position.w;
         
         // 深度测试
         if (renderState.isDepthTest()) {
@@ -383,9 +383,11 @@ public class SoftwareRaster extends ImageRaster {
      * @return
      */
     private boolean depthTest(float oldDepth, float newDepth) {
-        switch (renderState.getDepthMode()) {
+        switch (renderState.getDepthFunc()) {
         case ALWAYS:
             return true;
+        case NEVER:
+            return false;
         case LESS:
             return newDepth < oldDepth;
         case LESS_EQUAL:
