@@ -70,8 +70,8 @@ public class RasterizationVertex {
      * @return
      */
     public boolean isValid() {
-        return position.x > -1 && position.x < 1
-                && position.y > -1 && position.y < 1
-                && position.z > -1 && position.z < 1;
+        return position.x > -position.w && position.x < position.w
+                && position.y > -position.w && position.y < position.w
+                && position.z > -position.w && position.z < position.w;
     }
 }

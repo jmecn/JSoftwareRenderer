@@ -163,13 +163,18 @@ public class SoftwareRaster extends ImageRaster {
      */
     public void rasterizeTriangle(RasterizationVertex v0, RasterizationVertex v1, RasterizationVertex v2) {
         
+        // 将顶点变换到投影平面
+        v0.perspectiveDivide();
+        v1.perspectiveDivide();
+        v2.perspectiveDivide();
+        
         Matrix4f viewportMatrix = renderer.getViewportMatrix();
         
         // 把顶点位置修正到屏幕空间。
         viewportMatrix.mult(v0.position, v0.position);
         viewportMatrix.mult(v1.position, v1.position);
         viewportMatrix.mult(v2.position, v2.position);
-        
+
         if (renderState.isWireframe()) {
             rasterizeLine(v0, v1);
             rasterizeLine(v0, v2);

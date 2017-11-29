@@ -188,11 +188,6 @@ public class Renderer {
 
             // TODO 视锥裁剪
             
-            
-            out0.perspectiveDivide();
-            out1.perspectiveDivide();
-            out2.perspectiveDivide();
-            
             raster.rasterizeTriangle(out0, out1, out2);
         }
     }
