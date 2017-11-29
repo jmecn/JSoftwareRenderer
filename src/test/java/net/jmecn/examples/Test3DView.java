@@ -9,6 +9,7 @@ import net.jmecn.math.Vector4f;
 import net.jmecn.renderer.Camera;
 import net.jmecn.scene.Geometry;
 import net.jmecn.scene.Mesh;
+import net.jmecn.scene.shape.Box;
 
 /**
  * 测试3D观察的效果
@@ -34,30 +35,8 @@ public class Test3DView extends Application {
     @Override
     protected void initialize() {
         
-        // 立方体
-        Vector3f[] positions = {
-            new Vector3f(-1, -1, -1),
-            new Vector3f(1, -1, -1),
-            new Vector3f(-1, 1, -1),
-            new Vector3f(1, 1, -1),
-            new Vector3f(-1, -1, 1),
-            new Vector3f(1, -1, 1),
-            new Vector3f(-1, 1, 1),
-            new Vector3f(1, 1, 1),
-        };
-        
-        // 定义六面共12个三角形
-        int[] indexes = {
-            0, 2, 1, 1, 2, 3, // back
-            4, 5, 7, 4, 7, 6, // front
-            5, 1, 3, 5, 3, 7, // left
-            0, 6, 2, 0, 4, 6, // right
-            2, 6, 7, 2, 7, 3, // top
-            1, 4, 0, 1, 5, 4 // bottom
-        };
-        
         // 网格
-        Mesh mesh = new Mesh(positions, indexes);
+        Mesh mesh = new Box();
         
         // 材质
         Material material = new Material();

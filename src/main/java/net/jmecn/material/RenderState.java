@@ -40,7 +40,7 @@ public class RenderState {
 
     public RenderState() {
         isWireframe = false;
-        wireframeColor = new Vector4f(0, 1, 0, 1);
+        wireframeColor = null;
         
         faceCullMode = FaceCullMode.BACK;
         

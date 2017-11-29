@@ -6,43 +6,53 @@ import net.jmecn.math.Vector4f;
 import net.jmecn.scene.Mesh;
 import net.jmecn.scene.Vertex;
 
+/**
+ * 四边形网格。
+ * @author yanmaoyuan
+ *
+ */
 public class Quad extends Mesh {
 
-    float[] positions = {
-            -1, -1,  0,
-             1, -1,  0,
-             1,  1,  0,
-            -1,  1,  0
-    };
-    
-    float[] colors = {
-            1, 1, 0, 1,
-            0, 1, 1, 1,
-            1, 0, 1, 1,
-            1, 1, 1, 1
-    };
-    
-    float[] texCoords = {
-            0, 0,
-            1, 0,
-            1, 1,
-            0, 1
-    };
-    
-    float[] normals = {
-            0, 0, 1,
-            0, 0, 1,
-            0, 0, 1,
-            0, 0, 1
-    };
-    
-    int [] index = {
-            0, 1, 2,
-            0, 2, 3
-    };
-    
     public Quad() {
-        this.indexes = index;
+        
+        // 顶底位置
+        float[] positions = {
+                -1, -1,  0,
+                 1, -1,  0,
+                 1,  1,  0,
+                -1,  1,  0
+        };
+        
+        // 顶点颜色
+        float[] colors = {
+                1, 1, 0, 1,
+                0, 1, 1, 1,
+                1, 0, 1, 1,
+                1, 1, 1, 1
+        };
+        
+        // 纹理坐标
+        float[] texCoords = {
+                0, 0,
+                1, 0,
+                1, 1,
+                0, 1
+        };
+        
+        // 顶点法线
+        float[] normals = {
+                0, 0, 1,
+                0, 0, 1,
+                0, 0, 1,
+                0, 0, 1
+        };
+        
+        // 顶点索引
+        this.indexes = new int[]{
+                0, 1, 2,
+                0, 2, 3
+        };
+        
         this.vertexes = new Vertex[positions.length];
         
         for(int i = 0; i < indexes.length; i++) {

@@ -59,9 +59,9 @@ public class RasterizationVertex {
      */
     public void perspectiveDivide() {
         // 保存w值，用于透视修正
-        this.w = position.w;
+        w = position.w;
         // 齐次坐标
-        position.multLocal(1f / position.w);
+        position.multLocal(1f / w);
     }
     
     /**

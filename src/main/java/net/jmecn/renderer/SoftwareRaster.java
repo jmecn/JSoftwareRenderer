@@ -211,6 +211,7 @@ public class SoftwareRaster extends ImageRaster {
         } else {// 分割三角形
             
             // 线性插值
+            // FIXME 需要透视校正
             float t = (y1 - y0) / (y2 - y0);
             RasterizationVertex middleVert = new RasterizationVertex();
             middleVert.interpolateLocal(v0, v2, t);
