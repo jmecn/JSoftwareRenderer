@@ -182,13 +182,13 @@ public class SoftwareRaster extends ImageRaster {
             rasterizePixel((int)v2.position.x, (int)v2.position.y, v2);
             return;
         }
-        case WIREFRAME : {
+        case LINE : {
             rasterizeLine(v0, v1);
             rasterizeLine(v0, v2);
             rasterizeLine(v1, v2);
             return;
         }
-        case SOLID : {
+        case FACE : {
             // 按Y坐标把三个顶点从上到下冒泡排序
             RasterizationVertex tmp;
             if (v0.position.y > v1.position.y) {

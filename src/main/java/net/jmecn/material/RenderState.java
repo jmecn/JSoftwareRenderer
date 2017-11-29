@@ -1,7 +1,5 @@
 package net.jmecn.material;
 
-import net.jmecn.math.Vector4f;
-
 /**
  * 渲染状态
  * 
@@ -14,38 +12,46 @@ public class RenderState {
      * 剔除模式
      */
     public enum CullMode {
-        NEVER, FACE, BACK, ALWAYS
-    }
-
-    /**
-     * 深度测试模式
-     */
-    public enum DepthMode {
-        ALWAYS, LESS, LESS_EQUAL, GREATER, GREATER_EQUAL, EQUAL, NOT_EQUAL
-    }
-
-    /**
-     * 混色模式
-     */
-    public enum BlendMode {
-        OPACITY, // 实心
-        ADD, // 叠加
-        ALPHA_BLEND// ALPHA混合
+        NEVER,  // 不剔除
+        FACE,   // 剔除正面
+        BACK,   // 剔除背面
+        ALWAYS  // 完全剔除
     }
 
     /**
      * 填充模式
      */
     public enum FillMode {
-        POINT,// 点填充模式，在每个顶点绘制一个像素
-        WIREFRAME,// 线框模式，在每个边绘制一条直线
-        SOLID,// 实心模式，对每个面进行填充
+        POINT,  // 点填充模式，在每个顶点绘制一个像素
+        LINE,   // 线框模式，在每个边绘制一条直线
+        FACE,   // 面模式，对每个面进行填充
     }
 
+    /**
+     * 深度测试模式
+     */
+    public enum DepthMode {
+        ALWAYS,
+        LESS,
+        LESS_EQUAL,
+        GREATER,
+        GREATER_EQUAL,
+        EQUAL,
+        NOT_EQUAL
+    }
+
+    /**
+     * 混色模式
+     */
+    public enum BlendMode {
+        OPACITY,    // 实心
+        ADD,        // 叠加
+        ALPHA_BLEND // ALPHA混合
+    }
+    
     private CullMode cullMode;
     
     private FillMode fillMode;
-    private Vector4f wireframeColor;
     
     private boolean isAlphaTest;
     private float alphaFalloff;
@@ -57,8 +63,7 @@ public class RenderState {
     private BlendMode blendMode;
 
     public RenderState() {
-        fillMode = FillMode.SOLID;
-        
+        fillMode = FillMode.FACE;
         cullMode = CullMode.BACK;
         
         isAlphaTest = false;
@@ -78,15 +83,6 @@ public class RenderState {
 
     public void setFillMode(FillMode fillMode) {
         this.fillMode = fillMode;
-    }
-
-
-    public Vector4f getWireframeColor() {
-        return wireframeColor;
-    }
-
-    public void setWireframeColor(Vector4f color) {
-        this.wireframeColor.set(color);
     }
 
     public CullMode getCullMode() {

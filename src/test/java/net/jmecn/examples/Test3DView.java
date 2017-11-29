@@ -46,7 +46,7 @@ public class Test3DView extends Application {
         renderState.setCullMode(CullMode.NEVER);
         
         // 显示为线框
-        renderState.setFillMode(FillMode.WIREFRAME);
+        renderState.setFillMode(FillMode.LINE);
         
         // 添加到场景中
         this.geom = new Geometry(mesh, material);
@@ -68,7 +68,7 @@ public class Test3DView extends Application {
         }
         
         // 计算旋转：绕Z轴顺时针方向旋转
-        //geom.getLocalTransform().getRotation().fromAxisAngle(Vector3f.UNIT_Y, -angle);
+        geom.getLocalTransform().getRotation().fromAxisAngle(Vector3f.UNIT_Y, -angle);
     }
 
 }
