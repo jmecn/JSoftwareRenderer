@@ -2,6 +2,12 @@ package net.jmecn.scene;
 
 import net.jmecn.material.Material;
 
+/**
+ * 3D几何物体类，它是被渲染的最基本单元。
+ * 
+ * @author yanmaoyuan
+ *
+ */
 public class Geometry extends Spatial {
 
     private Mesh mesh;
@@ -33,5 +39,4 @@ public class Geometry extends Spatial {
     public void setMaterial(Material mat) {
         this.material = mat;
     }
-    
 }

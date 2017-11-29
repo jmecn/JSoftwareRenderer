@@ -20,6 +20,15 @@ public class Mesh {
      */
     protected int[] indexes;
 
+
+    public Vertex[] getVertexes() {
+        return vertexes;
+    }
+    
+    public int[] getIndexes() {
+        return indexes;
+    }
+    
     public Mesh() {
     }
     
@@ -27,25 +36,13 @@ public class Mesh {
         this(positions, indexes, null, null, null);
     }
     
-    /**
-     * 初始化三角网格。
-     * @param positions
-     * @param indexes
-     * @param texCoords
-     * @param normals
-     * @param colors
-     */
     public Mesh(Vector3f[] positions, int[] indexes, Vector2f[] texCoords, Vector3f[] normals, Vector4f[] colors) {
         this.indexes = indexes;
         this.vertexes = new Vertex[positions.length];
-        
         for(int i = 0; i < indexes.length; i++) {
             int index = indexes[i];
-            
             vertexes[index] = new Vertex();
-            
             vertexes[index].position = positions[index];
-            
             if (normals != null) {
                 vertexes[index].normal = normals[index];
             }
@@ -57,13 +54,4 @@ public class Mesh {
             }
         }
     }
-
-    public Vertex[] getVertexes() {
-        return vertexes;
-    }
-    
-    public int[] getIndexes() {
-        return indexes;
-    }
-
 }

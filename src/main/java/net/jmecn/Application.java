@@ -7,6 +7,7 @@ import net.jmecn.geom.Drawable;
 import net.jmecn.math.ColorRGBA;
 import net.jmecn.renderer.Camera;
 import net.jmecn.renderer.Renderer;
+import net.jmecn.scene.Geometry;
 import net.jmecn.scene.Node;
 
 /**
@@ -32,6 +33,8 @@ public abstract class Application {
     
     // 渲染队列
     protected List<Drawable> scene;
+    
+    // 3D场景
     protected Node rootNode;
 
     // 运行状态
@@ -140,8 +143,9 @@ public abstract class Application {
         // 清空场景
         renderer.clear();
 
-        // 绘制场景
-        renderer.render(rootNode, camera);
+        // 获取所有物体，绘制3D场景
+        List<Geometry> geomList = rootNode.getGeometryList(null);
+        renderer.render(geomList, camera);
         
         // 绘制2D场景
         int len = scene.size();

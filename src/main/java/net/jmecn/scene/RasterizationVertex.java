@@ -13,45 +13,42 @@ import net.jmecn.math.Vector4f;
 public class RasterizationVertex {
 
     public Vector4f position = new Vector4f();  // 片段位置
-    public Vector4f color = new Vector4f(1); // 片段颜色
-    public Vector3f normal = new Vector3f();     // 片段法线
-    public Vector2f texCoord = new Vector2f();   // 纹理坐标
+    public Vector4f color = new Vector4f(1);    // 片段颜色
+    public Vector3f normal = new Vector3f();    // 片段法线
+    public Vector2f texCoord = new Vector2f();  // 纹理坐标
 
-    public float w;
+    public float w;// 透视除法之前的w坐标
     
     public boolean hasNormal = false;
     public boolean hasTexCoord = false;
     public boolean hasVertexColor = false;
     
-    public RasterizationVertex() {
-        
-    }
-    
     /**
      * 插值
-     * @param beginVec
-     * @param finalVec
-     * @param changeAmnt
+     * @param 
+     * @param v1
+     * @param t
      * @return
      */
-    public RasterizationVertex interpolateLocal(RasterizationVertex beginVec, RasterizationVertex finalVec, float changeAmnt) {
+    public RasterizationVertex interpolateLocal(RasterizationVertex v0, RasterizationVertex v1, float t) {
         // 顶点插值
-        position.interpolateLocal(beginVec.position, finalVec.position, changeAmnt);
+        position.interpolateLocal(v0.position, v1.position, t);
+        w = (1 - t) * v0.w + t * v1.w;
 
         // 法线插值
-        if (beginVec.hasNormal) {
-            normal.interpolateLocal(beginVec.normal, finalVec.normal, changeAmnt);
-            this.hasNormal = beginVec.hasNormal;
+        if (v0.hasNormal) {
+            normal.interpolateLocal(v0.normal, v1.normal, t);
+            this.hasNormal = v0.hasNormal;
         }
         // 颜色插值
-        if (beginVec.hasVertexColor) {
-            color.interpolateLocal(beginVec.color, finalVec.color, changeAmnt);
-            this.hasVertexColor = beginVec.hasVertexColor;
+        if (v0.hasVertexColor) {
+            color.interpolateLocal(v0.color, v1.color, t);
+            this.hasVertexColor = v0.hasVertexColor;
         }
         // 纹理插值
-        if (beginVec.hasTexCoord) {
-            texCoord.interpolateLocal(beginVec.texCoord, finalVec.texCoord, changeAmnt);
-            this.hasTexCoord = beginVec.hasTexCoord;
+        if (v0.hasTexCoord) {
+            texCoord.interpolateLocal(v0.texCoord, v1.texCoord, t);
+            this.hasTexCoord = v0.hasTexCoord;
         }
         
         return this;

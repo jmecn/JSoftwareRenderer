@@ -10,7 +10,6 @@ import net.jmecn.math.Vector3f;
 import net.jmecn.math.Vector4f;
 import net.jmecn.scene.Geometry;
 import net.jmecn.scene.Mesh;
-import net.jmecn.scene.Node;
 import net.jmecn.scene.RasterizationVertex;
 import net.jmecn.scene.Vertex;
 
@@ -24,7 +23,7 @@ public class Renderer {
     // 渲染图像
     private Image image;
     // 光栅器
-    private VertexRaster raster;
+    private SoftwareRaster raster;
     // 清屏颜色
     private ColorRGBA clearColor = ColorRGBA.WHITE;
     
@@ -35,7 +34,7 @@ public class Renderer {
      */
     public Renderer(int width, int height) {
         image = new Image(width, height);
-        raster = new VertexRaster(this, image);
+        raster = new SoftwareRaster(this, image);
         
         // 计算视口变换矩阵
         updateViewportMatrix(width, height);
@@ -118,26 +117,23 @@ public class Renderer {
     
     /**
      * 渲染场景
-     * @param meshes
+     * @param scene
      * @param camera
      */
-    public void render(Node scene, Camera camera) {
+    public void render(List<Geometry> geomList, Camera camera) {
         
         // 根据Camera初始化观察变换矩阵。
         viewMatrix.set(camera.getViewMatrix());
         projectionMatrix.set(camera.getProjectionMatrix());
         viewProjectionMatrix.set(camera.getViewProjectionMatrix());
 
-        // 获取所有物体
-        List<Geometry> geomList = scene.getGeometryList(null);
-        
         // TODO 剔除那些不可见的物体
         
         // 遍历场景中的Mesh
         for(int i=0; i<geomList.size(); i++) {
             Geometry geom = geomList.get(i);
             
-            // 根据Mesh的世界变换，计算MVP等变换矩阵。
+            // 根据物体的世界变换，计算MVP等变换矩阵。
             worldMatrix.set(geom.getWorldTransform().toTransformMatrix());
             viewMatrix.mult(worldMatrix, worldViewMatrix);
             viewProjectionMatrix.mult(worldMatrix, worldViewProjectionMatrix);
@@ -150,8 +146,8 @@ public class Renderer {
     }
 
     /**
-     * 渲染单个Mesh
-     * @param mesh
+     * 渲染单个物体
+     * @param geometry
      */
     protected void render(Geometry geometry) {
         

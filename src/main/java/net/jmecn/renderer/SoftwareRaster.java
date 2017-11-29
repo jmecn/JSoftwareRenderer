@@ -7,30 +7,36 @@ import net.jmecn.math.Vector4f;
 import net.jmecn.scene.RasterizationVertex;
 
 /**
- * 顶点光栅器
+ * 软件光栅器
  * @author yanmaoyuan
  *
  */
-public class VertexRaster extends ImageRaster {
+public class SoftwareRaster extends ImageRaster {
 
     private final static float INV_SCALE = 1f / 255f;
     
+    // 深度缓冲
     protected float[] depthBuffer;
-    
+
+    // 渲染器
     protected Renderer renderer;
-    
+
+    // 渲染状态
     protected RenderState renderState;
     
     public void setRenderState(RenderState renderState) {
         this.renderState = renderState;
     }
     
-    public VertexRaster(Renderer renderer, Image image) {
+    public SoftwareRaster(Renderer renderer, Image image) {
         super(image);
         this.depthBuffer = new float[width * height];
         this.renderer = renderer;
     }
     
+    /**
+     * 清除深度缓冲
+     */
     public void clearDepthBuffer() {
         int length = width * height;
         for(int i=0; i<length; i++) {
@@ -44,7 +50,7 @@ public class VertexRaster extends ImageRaster {
      * @param y
      * @param frag
      */
-    public void rasterizePoint(int x, int y, RasterizationVertex frag) {
+    public void rasterizePixel(int x, int y, RasterizationVertex frag) {
         
         if (x < 0 || y < 0 || x >= width || y >= height) {
             return;
@@ -54,22 +60,21 @@ public class VertexRaster extends ImageRaster {
         fragmentShader(frag);
 
         int index = x + y * width;
-        
-        
-        
         float depth = frag.position.z;
         
         // 深度测试
-        if (renderState.isDepthTest() && !depthTest(depthBuffer[index], depth)) {
+        if (renderState.isDepthTest()) {
+            if (!depthTest(depthBuffer[index], depth))
             return;
         }
-        // ALPHA测试
+        
+        // Alpha测试
         if (renderState.isAlphaTest()) {
             if (frag.color.w < renderState.getAlphaFalloff())
                 return;
         }
 
-        // BLEND混色
+        // 混色
         Vector4f srcColor = frag.color;
         Vector4f destColor = getColor(x, y);
         
@@ -108,11 +113,10 @@ public class VertexRaster extends ImageRaster {
         components[index + 1] = (byte)(destColor.y * 0xFF);
         components[index + 2] = (byte)(destColor.z * 0xFF);
         components[index + 3] = (byte)(destColor.w * 0xFF);
-        
     }
     
     /**
-     * 夹逼对齐
+     * 对齐
      * @param v
      * @param min
      * @param max
@@ -151,12 +155,6 @@ public class VertexRaster extends ImageRaster {
         return color;
     }
 
-    public void drawTriangle(RasterizationVertex v0, RasterizationVertex v1, RasterizationVertex v2) {
-        rasterizeLine(v0, v1);
-        rasterizeLine(v0, v2);
-        rasterizeLine(v1, v2);
-    }
-    
     /**
      * 光栅化三角形
      * @param v0
@@ -173,7 +171,9 @@ public class VertexRaster extends ImageRaster {
         viewportMatrix.mult(v2.position, v2.position);
         
         if (renderState.isWireframe()) {
-            drawTriangle(v0, v1, v2);
+            rasterizeLine(v0, v1);
+            rasterizeLine(v0, v2);
+            rasterizeLine(v1, v2);
             return;
         }
         
@@ -300,12 +300,14 @@ public class VertexRaster extends ImageRaster {
             RasterizationVertex frag = new RasterizationVertex();
             frag.interpolateLocal(v0, v1, t);
             
-            rasterizePoint(x, y, frag);
+            rasterizePixel(x, y, frag);
         }
     }
     
     /**
      * 光栅化线段，使用Bresenham算法。
+     * @param v0
+     * @param v1
      */
     public void rasterizeLine(RasterizationVertex v0, RasterizationVertex v1) {
         int x = (int) v0.position.x;
@@ -336,7 +338,7 @@ public class VertexRaster extends ImageRaster {
             float t = (y - v0.position.y) / (v1.position.y - v0.position.y);
             RasterizationVertex frag = new RasterizationVertex();
             frag.interpolateLocal(v0, v1, t);
-            rasterizePoint(x, y, frag);
+            rasterizePixel(x, y, frag);
             
             numerator += slowStep;
             if (numerator >= fastStep) {
@@ -353,7 +355,7 @@ public class VertexRaster extends ImageRaster {
             frag = new RasterizationVertex();
             frag.interpolateLocal(v0, v1, t);
             
-            rasterizePoint(x, y, frag);
+            rasterizePixel(x, y, frag);
         }
     }
     
