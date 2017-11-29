@@ -15,7 +15,7 @@ import net.jmecn.scene.Geometry;
 import net.jmecn.scene.Mesh;
 
 /**
- * 测试纹理采样效果
+ * 测试纹理包裹模式
  * @author yanmaoyuan
  *
  */
@@ -24,7 +24,7 @@ public class Test3DWarpMode extends Application {
     public static void main(String[] args) {
         Test3DWarpMode app = new Test3DWarpMode();
         app.setResolution(400, 300);
-        app.setTitle("Test Texture");
+        app.setTitle("Test WarpMode");
         app.setFrameRate(60);
         app.start();
     }
