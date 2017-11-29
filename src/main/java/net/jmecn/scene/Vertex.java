@@ -4,6 +4,11 @@ import net.jmecn.math.Vector2f;
 import net.jmecn.math.Vector3f;
 import net.jmecn.math.Vector4f;
 
+/**
+ * 顶点数据
+ * @author yanmaoyuan
+ *
+ */
 public class Vertex {
 
     public Vector3f position;  // 顶点位置

@@ -8,9 +8,11 @@ import net.jmecn.math.ColorRGBA;
 import net.jmecn.math.Matrix4f;
 import net.jmecn.math.Vector3f;
 import net.jmecn.math.Vector4f;
+import net.jmecn.scene.Geometry;
 import net.jmecn.scene.Mesh;
+import net.jmecn.scene.Node;
+import net.jmecn.scene.RasterizationVertex;
 import net.jmecn.scene.Vertex;
-import net.jmecn.scene.VertexOut;
 
 /**
  * 渲染器
@@ -119,26 +121,29 @@ public class Renderer {
      * @param meshes
      * @param camera
      */
-    public void render(List<Mesh> meshes, Camera camera) {
+    public void render(Node scene, Camera camera) {
         
         // 根据Camera初始化观察变换矩阵。
         viewMatrix.set(camera.getViewMatrix());
         projectionMatrix.set(camera.getProjectionMatrix());
         viewProjectionMatrix.set(camera.getViewProjectionMatrix());
 
+        // 获取所有物体
+        List<Geometry> geomList = scene.getGeometryList(null);
+        
         // 遍历场景中的Mesh
-        for(int i=0; i<meshes.size(); i++) {
-            Mesh mesh = meshes.get(i);
+        for(int i=0; i<geomList.size(); i++) {
+            Geometry geom = geomList.get(i);
             
             // 根据Mesh的世界变换，计算MVP等变换矩阵。
-            worldMatrix.set(mesh.getTransform().toTransformMatrix());
+            worldMatrix.set(geom.getWorldTransform().toTransformMatrix());
             viewMatrix.mult(worldMatrix, worldViewMatrix);
             viewProjectionMatrix.mult(worldMatrix, worldViewProjectionMatrix);
             
             // TODO 剔除不可见的Mesh
             
             // 渲染
-            render(mesh);
+            render(geom);
         }
     }
 
@@ -146,10 +151,10 @@ public class Renderer {
      * 渲染单个Mesh
      * @param mesh
      */
-    protected void render(Mesh mesh) {
+    protected void render(Geometry geometry) {
         
         // 设置材质
-        this.material = mesh.getMaterial();
+        this.material = geometry.getMaterial();
         // 设置渲染状态
         this.raster.setRenderState(material.getRenderState());
         
@@ -159,6 +164,7 @@ public class Renderer {
         Vector3f c = new Vector3f();
         
         // 遍历所有三角形
+        Mesh mesh = geometry.getMesh();
         int[] indexes = mesh.getIndexes();
         Vertex[] vertexes = mesh.getVertexes();
         
@@ -177,9 +183,9 @@ public class Renderer {
                 continue;
 
             // 执行顶点着色器
-            VertexOut out0 = vertexShader(v0);
-            VertexOut out1 = vertexShader(v1);
-            VertexOut out2 = vertexShader(v2);
+            RasterizationVertex out0 = vertexShader(v0);
+            RasterizationVertex out1 = vertexShader(v1);
+            RasterizationVertex out2 = vertexShader(v2);
 
             // TODO 视锥裁剪
             
@@ -234,8 +240,8 @@ public class Renderer {
      * @param vert
      * @return
      */
-    protected VertexOut vertexShader(Vertex vert) {
-        VertexOut out = new VertexOut();
+    protected RasterizationVertex vertexShader(Vertex vert) {
+        RasterizationVertex out = new RasterizationVertex();
         // 顶点位置
         out.position.set(vert.position, 1f);
         // 顶点法线

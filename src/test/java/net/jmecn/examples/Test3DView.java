@@ -7,6 +7,7 @@ import net.jmecn.material.RenderState.FaceCullMode;
 import net.jmecn.math.Vector3f;
 import net.jmecn.math.Vector4f;
 import net.jmecn.renderer.Camera;
+import net.jmecn.scene.Geometry;
 import net.jmecn.scene.Mesh;
 
 /**
@@ -24,7 +25,7 @@ public class Test3DView extends Application {
         app.start();
     }
 
-    private Mesh mesh;// 网格
+    private Geometry geom;
     
     private final static float PI = 3.1415626f;
     private final static float _2PI = PI * 2;
@@ -55,25 +56,27 @@ public class Test3DView extends Application {
             1, 4, 0, 1, 5, 4 // bottom
         };
         
-        mesh = new Mesh(positions, indexes);
+        // 网格
+        Mesh mesh = new Mesh(positions, indexes);
         
-        // 定义材质
+        // 材质
         Material material = new Material();
-        mesh.setMaterial(material);
-        // 设置渲染模式
-        RenderState renderState = mesh.getMaterial().getRenderState();
+        RenderState renderState = material.getRenderState();
+
+        // 不裁剪背面
         renderState.setFaceCullMode(FaceCullMode.NEVER);
+        
+        // 显示为黄色线框
         renderState.setWireframe(true);
-        renderState.setWireframeColor(new Vector4f(1, 0, 0, 1));
+        renderState.setWireframeColor(new Vector4f(1, 1, 0, 1));
         
         // 添加到场景中
-        meshes.add(mesh);
+        this.geom = new Geometry(mesh, material);
+        rootNode.attachChild(geom);
         
         // 调整摄像机的位置
         Camera cam = getCamera();
-        cam.setLocation(new Vector3f(3, 4, 8));
-        cam.setDirection(new Vector3f(-3, -4, -8).normalizeLocal());
-        cam.updateViewProjectionMatrix();
+        cam.lookAt(new Vector3f(3, 4, 8), Vector3f.ZERO, Vector3f.UNIT_Y);
     }
 
     @Override
@@ -87,7 +90,7 @@ public class Test3DView extends Application {
         }
         
         // 计算旋转：绕Z轴顺时针方向旋转
-        mesh.getTransform().getRotation().fromAxisAngle(Vector3f.UNIT_Y, -angle);
+        geom.getLocalTransform().getRotation().fromAxisAngle(Vector3f.UNIT_Y, -angle);
     }
 
 }

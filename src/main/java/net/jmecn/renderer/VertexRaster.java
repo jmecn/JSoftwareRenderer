@@ -4,7 +4,7 @@ import net.jmecn.material.RenderState;
 import net.jmecn.material.Texture;
 import net.jmecn.math.Matrix4f;
 import net.jmecn.math.Vector4f;
-import net.jmecn.scene.VertexOut;
+import net.jmecn.scene.RasterizationVertex;
 
 /**
  * 顶点光栅器
@@ -44,7 +44,7 @@ public class VertexRaster extends ImageRaster {
      * @param y
      * @param frag
      */
-    public void rasterizePoint(int x, int y, VertexOut frag) {
+    public void rasterizePoint(int x, int y, RasterizationVertex frag) {
         
         if (x < 0 || y < 0 || x >= width || y >= height) {
             return;
@@ -151,7 +151,7 @@ public class VertexRaster extends ImageRaster {
         return color;
     }
 
-    public void drawTriangle(VertexOut v0, VertexOut v1, VertexOut v2) {
+    public void drawTriangle(RasterizationVertex v0, RasterizationVertex v1, RasterizationVertex v2) {
         rasterizeLine(v0, v1);
         rasterizeLine(v0, v2);
         rasterizeLine(v1, v2);
@@ -163,7 +163,7 @@ public class VertexRaster extends ImageRaster {
      * @param v1
      * @param v2
      */
-    public void rasterizeTriangle(VertexOut v0, VertexOut v1, VertexOut v2) {
+    public void rasterizeTriangle(RasterizationVertex v0, RasterizationVertex v1, RasterizationVertex v2) {
         
         Matrix4f viewportMatrix = renderer.getViewportMatrix();
         
@@ -178,7 +178,7 @@ public class VertexRaster extends ImageRaster {
         }
         
         // 按Y坐标把三个顶点从上到下冒泡排序
-        VertexOut tmp;
+        RasterizationVertex tmp;
         if (v0.position.y > v1.position.y) {
             tmp = v0;
             v0 = v1;
@@ -207,7 +207,7 @@ public class VertexRaster extends ImageRaster {
             
             // 线性插值
             float t = (y1 - y0) / (y2 - y0);
-            VertexOut middleVert = new VertexOut();
+            RasterizationVertex middleVert = new RasterizationVertex();
             middleVert.interpolateLocal(v0, v2, t);
             
             if (middleVert.position.x <= v1.position.x)  {// 左三角形
@@ -230,7 +230,7 @@ public class VertexRaster extends ImageRaster {
      * @param v1 底边左顶点
      * @param v2 底边右顶点
      */
-    private void fillBottomLineTriangle(VertexOut v0, VertexOut v1, VertexOut v2) {
+    private void fillBottomLineTriangle(RasterizationVertex v0, RasterizationVertex v1, RasterizationVertex v2) {
         int y0 = (int) Math.ceil(v0.position.y);
         int y2 = (int) Math.ceil(v2.position.y);
         
@@ -241,9 +241,9 @@ public class VertexRaster extends ImageRaster {
                 // FIXME 需要透视校正
                 float t = (y - v0.position.y) / (v1.position.y - v0.position.y);
                 
-                VertexOut vl = new VertexOut();
+                RasterizationVertex vl = new RasterizationVertex();
                 vl.interpolateLocal(v0, v1, t);
-                VertexOut vr = new VertexOut();
+                RasterizationVertex vr = new RasterizationVertex();
                 vr.interpolateLocal(v0, v2, t);
 
                 //扫描线填充
@@ -258,7 +258,7 @@ public class VertexRaster extends ImageRaster {
      * @param v1 顶边右顶点
      * @param v2 下顶点
      */
-    private void fillTopLineTriangle(VertexOut v0, VertexOut v1, VertexOut v2) {
+    private void fillTopLineTriangle(RasterizationVertex v0, RasterizationVertex v1, RasterizationVertex v2) {
         int y0 = (int) Math.ceil(v0.position.y);
         int y2 = (int) Math.ceil(v2.position.y);
 
@@ -268,9 +268,9 @@ public class VertexRaster extends ImageRaster {
                 // FIXME 需要透视校正
                 float t = (y - v0.position.y) / (v2.position.y - v0.position.y);
                 
-                VertexOut vl = new VertexOut();
+                RasterizationVertex vl = new RasterizationVertex();
                 vl.interpolateLocal(v0, v2, t);
-                VertexOut vr = new VertexOut();
+                RasterizationVertex vr = new RasterizationVertex();
                 vr.interpolateLocal(v1, v2, t);
                 
                 //扫描线填充
@@ -285,7 +285,7 @@ public class VertexRaster extends ImageRaster {
      * @param v1
      * @param y
      */
-    public void rasterizeScanline(VertexOut v0, VertexOut v1, int y) {
+    public void rasterizeScanline(RasterizationVertex v0, RasterizationVertex v1, int y) {
         int x0 = (int) Math.ceil(v0.position.x);
         // 按照DirectX和OpenGL的光栅化规则，舍弃右下的顶点。
         int x1 = (int) Math.floor(v1.position.x);
@@ -297,7 +297,7 @@ public class VertexRaster extends ImageRaster {
             // 线性插值
             // FIXME 需要透视校正
             float t = (x - v0.position.x) / (v1.position.x - v0.position.x);
-            VertexOut frag = new VertexOut();
+            RasterizationVertex frag = new RasterizationVertex();
             frag.interpolateLocal(v0, v1, t);
             
             rasterizePoint(x, y, frag);
@@ -307,7 +307,7 @@ public class VertexRaster extends ImageRaster {
     /**
      * 光栅化线段，使用Bresenham算法。
      */
-    public void rasterizeLine(VertexOut v0, VertexOut v1) {
+    public void rasterizeLine(RasterizationVertex v0, RasterizationVertex v1) {
         int x = (int) v0.position.x;
         int y = (int) v0.position.y;
 
@@ -334,7 +334,7 @@ public class VertexRaster extends ImageRaster {
         for (int i = 0; i <= fastStep; i++) {
             // 线性插值
             float t = (y - v0.position.y) / (v1.position.y - v0.position.y);
-            VertexOut frag = new VertexOut();
+            RasterizationVertex frag = new RasterizationVertex();
             frag.interpolateLocal(v0, v1, t);
             rasterizePoint(x, y, frag);
             
@@ -350,7 +350,7 @@ public class VertexRaster extends ImageRaster {
             
             // 线性插值
             t = (y - v0.position.y) / (v1.position.y - v0.position.y);
-            frag = new VertexOut();
+            frag = new RasterizationVertex();
             frag.interpolateLocal(v0, v1, t);
             
             rasterizePoint(x, y, frag);
@@ -387,7 +387,7 @@ public class VertexRaster extends ImageRaster {
      * 片段着色器
      * @param frag
      */
-    private void fragmentShader(VertexOut frag) {
+    private void fragmentShader(RasterizationVertex frag) {
         Texture texture = renderer.getMaterial().getTexture();
         if (texture != null && frag.hasTexCoord) {
             Vector4f texColor = texture.sample2d(frag.texCoord);

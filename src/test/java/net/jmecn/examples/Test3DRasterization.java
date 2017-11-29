@@ -3,7 +3,7 @@ package net.jmecn.examples;
 import net.jmecn.Application;
 import net.jmecn.material.Material;
 import net.jmecn.math.Vector3f;
-import net.jmecn.scene.Mesh;
+import net.jmecn.scene.Geometry;
 import net.jmecn.scene.shape.Box;
 
 /**
@@ -28,12 +28,8 @@ public class Test3DRasterization extends Application {
                 Vector3f.ZERO, Vector3f.UNIT_Y);
         
         // 添加到场景中
-        Mesh mesh = new Box();
-        // 定义材质
-        Material material = new Material();
-        mesh.setMaterial(material);
-        
-        meshes.add(mesh);
+        Geometry geom = new Geometry(new Box(), new Material());
+        rootNode.attachChild(geom);
     }
 
     @Override

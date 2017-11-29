@@ -4,7 +4,7 @@ import net.jmecn.Application;
 import net.jmecn.material.Material;
 import net.jmecn.material.Texture;
 import net.jmecn.math.Vector3f;
-import net.jmecn.scene.Mesh;
+import net.jmecn.scene.Geometry;
 import net.jmecn.scene.shape.Box;
 
 /**
@@ -28,11 +28,10 @@ public class Test3DDepthBuffer extends Application {
                 Vector3f.ZERO, Vector3f.UNIT_Y);
         
         // 第一个方块
-        Mesh mesh = new Box();
-        
+        Geometry geom = new Geometry(new Box());
         // 定义材质
         Material material = new Material();
-        mesh.setMaterial(material);
+        geom.setMaterial(material);
         
         // 使用程序纹理
         Texture texture = new Texture();
@@ -40,27 +39,27 @@ public class Test3DDepthBuffer extends Application {
         material.setTexture(texture);
         
         // 添加到场景中
-        meshes.add(mesh);
-        
+        rootNode.attachChild(geom);
         
         // 第二个方块
-        mesh = new Box();
+        geom = new Geometry(new Box());
         
         // 定义材质
         material = new Material();
-        mesh.setMaterial(material);
+        geom.setMaterial(material);
         
         // 使用程序纹理
         texture = new Texture();
         texture.setLinearFilter(false);
         material.setTexture(texture);
-        mesh.getTransform().setTranslation(0.5f, -0.5f, -0.5f);
+        geom.getLocalTransform().setTranslation(0.5f, -0.5f, -0.5f);
         
         // 添加到场景中
-        meshes.add(mesh);
+        rootNode.attachChild(geom);
     }
 
     @Override
-    protected void update(float delta) {}
+    protected void update(float delta) {
+    }
 
 }

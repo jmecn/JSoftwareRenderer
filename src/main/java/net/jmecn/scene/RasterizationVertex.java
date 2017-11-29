@@ -10,18 +10,20 @@ import net.jmecn.math.Vector4f;
  * @author yanmaoyuan
  *
  */
-public class VertexOut {
+public class RasterizationVertex {
 
     public Vector4f position = new Vector4f();  // 片段位置
     public Vector4f color = new Vector4f(1); // 片段颜色
     public Vector3f normal = new Vector3f();     // 片段法线
     public Vector2f texCoord = new Vector2f();   // 纹理坐标
 
+    public float w;
+    
     public boolean hasNormal = false;
     public boolean hasTexCoord = false;
     public boolean hasVertexColor = false;
     
-    public VertexOut() {
+    public RasterizationVertex() {
         
     }
     
@@ -32,7 +34,7 @@ public class VertexOut {
      * @param changeAmnt
      * @return
      */
-    public VertexOut interpolateLocal(VertexOut beginVec, VertexOut finalVec, float changeAmnt) {
+    public RasterizationVertex interpolateLocal(RasterizationVertex beginVec, RasterizationVertex finalVec, float changeAmnt) {
         // 顶点插值
         position.interpolateLocal(beginVec.position, finalVec.position, changeAmnt);
 
@@ -59,11 +61,10 @@ public class VertexOut {
      * 透视除法
      */
     public void perspectiveDivide() {
-        float scalor = 1f / position.w;
-        position.x *= scalor;
-        position.y *= scalor;
-        position.z *= scalor;
-        position.w *= scalor;
+        // 保存w值，用于透视修正
+        this.w = position.w;
+        // 齐次坐标
+        position.multLocal(1f / position.w);
     }
     
     /**

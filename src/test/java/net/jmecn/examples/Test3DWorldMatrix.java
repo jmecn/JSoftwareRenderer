@@ -1,7 +1,9 @@
 package net.jmecn.examples;
 
 import net.jmecn.Application;
+import net.jmecn.material.Material;
 import net.jmecn.math.Vector3f;
+import net.jmecn.scene.Geometry;
 import net.jmecn.scene.Mesh;
 
 /**
@@ -19,7 +21,7 @@ public class Test3DWorldMatrix extends Application {
         app.start();
     }
 
-    private Mesh mesh;// 网格
+    private Geometry geom;// 网格
     
     private final static float PI = 3.1415626f;
     private final static float _2PI = PI * 2;
@@ -27,6 +29,10 @@ public class Test3DWorldMatrix extends Application {
     
     @Override
     protected void initialize() {
+        // 初始化摄像机
+        getCamera().lookAt(new Vector3f(1, 1, 3),
+                new Vector3f(1, 1, 0), Vector3f.UNIT_Y);
+        
         // 一个四边形的顶点
         Vector3f[] positions = {
             new Vector3f(0, 0, 0),
@@ -41,14 +47,14 @@ public class Test3DWorldMatrix extends Application {
             0, 2, 3,
         };
         
-        mesh = new Mesh(positions, indexes);
-        
+        geom = new Geometry(new Mesh(positions, indexes));
+        geom.setMaterial(new Material());
         // 初始化空间变换
-        mesh.getTransform().setTranslation(200, 200, 0);
-        mesh.getTransform().setScale(50);
+        geom.getLocalTransform().setTranslation(2, 1, 0);
+        geom.getLocalTransform().setScale(0.5f);
         
         // 添加到场景中
-        scene.add(mesh);
+        rootNode.attachChild(geom);
     }
 
     @Override
@@ -61,13 +67,13 @@ public class Test3DWorldMatrix extends Application {
             angle -= _2PI;
         }
         
-        // 计算位移：以(200, 200)为中心，半径100做圆周运动。
-        float x = (float) (Math.cos(angle) * 100 + 200);
-        float y = (float) (Math.sin(angle) * 100 + 200);
-        mesh.getTransform().setTranslation(x, y, 0);
+        // 计算位移：以(1, 1)为中心，半径1做圆周运动。
+        float x = (float) (Math.cos(angle) + 1);
+        float y = (float) (Math.sin(angle) + 1);
+        geom.getLocalTransform().setTranslation(x, y, 0);
         
         // 计算旋转：绕Z轴顺时针方向旋转
-        mesh.getTransform().getRotation().fromAxisAngle(Vector3f.UNIT_Z, -angle);
+        geom.getLocalTransform().getRotation().fromAxisAngle(Vector3f.UNIT_Z, -angle);
     }
 
 }

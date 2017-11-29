@@ -4,8 +4,8 @@ import net.jmecn.Application;
 import net.jmecn.material.Material;
 import net.jmecn.material.Texture;
 import net.jmecn.math.Vector3f;
-import net.jmecn.scene.Mesh;
-import net.jmecn.scene.shape.Box;
+import net.jmecn.scene.Geometry;
+import net.jmecn.scene.shape.Quad;
 
 /**
  * 测试纹理采样效果
@@ -27,12 +27,8 @@ public class Test3DTexture extends Application {
         getCamera().lookAt(new Vector3f(3, 4, 5),
                 Vector3f.ZERO, Vector3f.UNIT_Y);
         
-        
-        Mesh mesh = new Box();
-        
         // 定义材质
         Material material = new Material();
-        mesh.setMaterial(material);
         
         // 使用程序纹理
         Texture texture = new Texture();
@@ -40,7 +36,8 @@ public class Test3DTexture extends Application {
         material.setTexture(texture);
         
         // 添加到场景中
-        meshes.add(mesh);
+        Geometry geom = new Geometry(new Quad(), material);
+        rootNode.attachChild(geom);
     }
 
     @Override

@@ -7,7 +7,7 @@ import net.jmecn.geom.Drawable;
 import net.jmecn.math.ColorRGBA;
 import net.jmecn.renderer.Camera;
 import net.jmecn.renderer.Renderer;
-import net.jmecn.scene.Mesh;
+import net.jmecn.scene.Node;
 
 /**
  * 应用程序主类
@@ -32,7 +32,7 @@ public abstract class Application {
     
     // 渲染队列
     protected List<Drawable> scene;
-    protected List<Mesh> meshes;
+    protected Node rootNode;
 
     // 运行状态
     private boolean isRunning;
@@ -57,7 +57,7 @@ public abstract class Application {
         
         // 初始化渲染队列
         scene = new ArrayList<Drawable>();
-        meshes = new ArrayList<Mesh>();
+        rootNode = new Node();
         
         // 改变运行状态
         isRunning = true;
@@ -141,7 +141,7 @@ public abstract class Application {
         renderer.clear();
 
         // 绘制场景
-        renderer.render(meshes, camera);
+        renderer.render(rootNode, camera);
         
         // 绘制2D场景
         int len = scene.size();
