@@ -2,6 +2,7 @@ package net.jmecn.renderer;
 
 import java.util.List;
 
+import net.jmecn.light.Light;
 import net.jmecn.material.Material;
 import net.jmecn.material.RenderState.CullMode;
 import net.jmecn.math.ColorRGBA;
@@ -11,6 +12,7 @@ import net.jmecn.scene.Geometry;
 import net.jmecn.scene.Mesh;
 import net.jmecn.scene.RasterizationVertex;
 import net.jmecn.scene.Vertex;
+import net.jmecn.shader.Shader;
 
 /**
  * 渲染器
@@ -25,6 +27,8 @@ public class Renderer {
     private SoftwareRaster raster;
     // 清屏颜色
     private ColorRGBA clearColor = ColorRGBA.WHITE;
+    // 光源
+    private List<Light> lights;
     
     /**
      * 初始化渲染器
@@ -113,7 +117,7 @@ public class Renderer {
         
         viewportMatrix.set(m00, m01, m02, m03, m10, m11, m12, m13, m20, m21, m22, m23, m30, m31, m32, m33);
     }
-    
+
     /**
      * 渲染场景
      * @param scene
@@ -155,6 +159,18 @@ public class Renderer {
         // 设置渲染状态
         this.raster.setRenderState(material.getRenderState());
         
+        // 设置着色器
+        Shader shader = material.getShader();
+        raster.setShader(shader);
+        
+        // 设置全局变量
+        shader.setWorldMatrix(worldMatrix);
+        shader.setViewMatrix(viewMatrix);
+        shader.setProjectionMatrix(projectionMatrix);
+        shader.setWorldViewMatrix(worldViewMatrix);
+        shader.setViewProjectionMatrix(viewProjectionMatrix);
+        shader.setWorldViewProjectionMatrix(worldViewProjectionMatrix);
+        
         // 用于保存变换后的向量坐标。
         Vector3f a = new Vector3f();
         Vector3f b = new Vector3f();
@@ -173,9 +189,9 @@ public class Renderer {
             Vertex v2 = vertexes[indexes[i+2]];
             
             // 执行顶点着色器
-            RasterizationVertex out0 = vertexShader(v0);
-            RasterizationVertex out1 = vertexShader(v1);
-            RasterizationVertex out2 = vertexShader(v2);
+            RasterizationVertex out0 = shader.vertexShader(v0);
+            RasterizationVertex out1 = shader.vertexShader(v1);
+            RasterizationVertex out2 = shader.vertexShader(v2);
             
             // 在观察空间进行背面消隐
             worldViewMatrix.mult(v0.position, a);
@@ -232,7 +248,7 @@ public class Renderer {
      * @param vert
      * @return
      */
-    protected RasterizationVertex vertexShader(Vertex vert) {
+    private RasterizationVertex vertexShader(Vertex vert) {
         RasterizationVertex out = new RasterizationVertex();
         // 顶点位置
         out.position.set(vert.position, 1f);
@@ -270,6 +286,14 @@ public class Renderer {
 
     public Material getMaterial() {
         return material;
+    }
+    
+    /**
+     * 设置光源
+     * @param lights
+     */
+    public void setLights(List<Light> lights) {
+        this.lights = lights;
     }
 
 }

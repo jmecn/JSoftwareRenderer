@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.jmecn.geom.Drawable;
+import net.jmecn.light.Light;
 import net.jmecn.math.ColorRGBA;
 import net.jmecn.renderer.Camera;
 import net.jmecn.renderer.Renderer;
@@ -36,6 +37,9 @@ public abstract class Application {
     
     // 3D场景
     protected Node rootNode;
+    
+    // 光源
+    protected List<Light> lights;
 
     // 运行状态
     private boolean isRunning;
@@ -62,6 +66,9 @@ public abstract class Application {
         scene = new ArrayList<Drawable>();
         rootNode = new Node();
         
+        // 光源
+        lights = new ArrayList<Light>();
+        
         // 改变运行状态
         isRunning = true;
         
@@ -85,6 +92,7 @@ public abstract class Application {
         // 创建渲染器
         renderer = new Renderer(width, height);
         renderer.setBackgroundColor(ColorRGBA.DARKGRAY);
+        renderer.setLights(lights);
         
         // 创建摄像机
         camera = new Camera(width, height);

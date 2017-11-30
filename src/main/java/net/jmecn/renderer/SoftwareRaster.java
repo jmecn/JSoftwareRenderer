@@ -5,6 +5,7 @@ import net.jmecn.material.Texture;
 import net.jmecn.math.Matrix4f;
 import net.jmecn.math.Vector4f;
 import net.jmecn.scene.RasterizationVertex;
+import net.jmecn.shader.Shader;
 
 /**
  * 软件光栅器
@@ -26,6 +27,13 @@ public class SoftwareRaster extends ImageRaster {
     
     public void setRenderState(RenderState renderState) {
         this.renderState = renderState;
+    }
+    
+    // 着色器
+    protected Shader shader;
+    
+    public void setShader(Shader shader) {
+        this.shader = shader;
     }
     
     public SoftwareRaster(Renderer renderer, Image image) {
@@ -61,8 +69,10 @@ public class SoftwareRaster extends ImageRaster {
         frag.texCoord.multLocal(w);
         frag.color.multLocal(w);
         frag.normal.multLocal(w);
+        
         // 执行片段着色器
-        fragmentShader(frag);
+        if ( !shader.fragmentShader(frag) )
+            return;
 
         int index = x + y * width;
         float depth = frag.position.z;
