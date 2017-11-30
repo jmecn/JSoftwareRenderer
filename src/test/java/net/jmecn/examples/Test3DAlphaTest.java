@@ -33,7 +33,7 @@ public class Test3DAlphaTest extends Application {
         
         // 使用程序纹理
         Texture texture = new Texture();
-        material.setTexture(texture);
+        material.setDiffuseMap(texture);
 
         // 不裁剪，这样我们就能看到立方体的内部。
         material.getRenderState().setCullMode(CullMode.NEVER);

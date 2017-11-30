@@ -48,7 +48,7 @@ public class Test3DBlendMode extends Application {
         
         // 使用默认的程序纹理
         Texture texture = new Texture();
-        material.setTexture(texture);
+        material.setDiffuseMap(texture);
         
         // 关闭Alpha测试
         material.getRenderState().setAlphaTest(false);
@@ -70,7 +70,7 @@ public class Test3DBlendMode extends Application {
         try {
             Image image = new Image("res/grass.png");
             Texture texture = new Texture(image);
-            material.setTexture(texture);
+            material.setDiffuseMap(texture);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -95,7 +95,7 @@ public class Test3DBlendMode extends Application {
         try {
             Image image = new Image("res/blending_transparent_window.png");
             Texture texture = new Texture(image);
-            material.setTexture(texture);
+            material.setDiffuseMap(texture);
         } catch (IOException e) {
             e.printStackTrace();
         }

@@ -44,7 +44,7 @@ public class Test3DWarpMode extends Application {
             texture.setBorderColor(new Vector4f(0));
             texture.setWarpMode(WarpAxis.S, WarpMode.REPEAT);
             texture.setWarpMode(WarpAxis.T, WarpMode.MIRRORED_REPEAT);
-            material.setTexture(texture);
+            material.setDiffuseMap(texture);
         } catch (IOException e) {
             e.printStackTrace();
         }

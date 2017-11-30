@@ -1,7 +1,6 @@
 package net.jmecn.renderer;
 
 import net.jmecn.material.RenderState;
-import net.jmecn.material.Texture;
 import net.jmecn.math.Matrix4f;
 import net.jmecn.math.Vector4f;
 import net.jmecn.scene.RasterizationVertex;
@@ -30,7 +29,7 @@ public class SoftwareRaster extends ImageRaster {
     }
     
     // 着色器
-    protected Shader shader;
+    private Shader shader;
     
     public void setShader(Shader shader) {
         this.shader = shader;
@@ -419,15 +418,15 @@ public class SoftwareRaster extends ImageRaster {
         return false;
     }
     
-    /**
-     * 片段着色器
-     * @param frag
-     */
-    private void fragmentShader(RasterizationVertex frag) {
-        Texture texture = renderer.getMaterial().getTexture();
-        if (texture != null && frag.hasTexCoord) {
-            Vector4f texColor = texture.sample2d(frag.texCoord);
-            frag.color.multLocal(texColor);
-        }
-    }
+//    /**
+//     * 片段着色器
+//     * @param frag
+//     */
+//    private void fragmentShader(RasterizationVertex frag) {
+//        Texture texture = renderer.getMaterial().getDiffuseMap();
+//        if (texture != null && frag.hasTexCoord) {
+//            Vector4f texColor = texture.sample2d(frag.texCoord);
+//            frag.color.multLocal(texColor);
+//        }
+//    }
 }

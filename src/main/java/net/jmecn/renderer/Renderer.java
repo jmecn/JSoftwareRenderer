@@ -161,6 +161,7 @@ public class Renderer {
         
         // 设置着色器
         Shader shader = material.getShader();
+        shader.setLights(lights);
         raster.setShader(shader);
         
         // 设置全局变量
@@ -243,39 +244,6 @@ public class Renderer {
         }
     }
     
-    /**
-     * 顶点着色
-     * @param vert
-     * @return
-     */
-    private RasterizationVertex vertexShader(Vertex vert) {
-        RasterizationVertex out = new RasterizationVertex();
-        // 顶点位置
-        out.position.set(vert.position, 1f);
-        // 顶点法线
-        if (vert.normal != null) {
-            out.normal.set(vert.normal);
-            out.hasNormal = true;
-        }
-        // 纹理坐标
-        if (vert.texCoord != null) {
-            out.texCoord.set(vert.texCoord);
-            out.hasTexCoord = true;
-        }
-        // 顶点颜色
-        if (vert.color != null) {
-            out.color.set(vert.color);
-            out.hasVertexColor = true;
-        }
-        
-        // 顶点着色器
-        // 模型-观察-透视 变换
-        worldViewProjectionMatrix.mult(out.position, out.position);
-        
-        return out;
-    }
-
-
     public Matrix4f getViewportMatrix() {
         return viewportMatrix;
     }

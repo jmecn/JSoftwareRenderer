@@ -36,7 +36,7 @@ public class Test3DTexture extends Application {
         // 使用程序纹理
         Texture texture = new Texture();
         texture.setMagFilter(MagFilter.NEAREST);
-        material.setTexture(texture);
+        material.setDiffuseMap(texture);
         
         // 添加到场景中
         Geometry geom = new Geometry(new Quad(), material);
