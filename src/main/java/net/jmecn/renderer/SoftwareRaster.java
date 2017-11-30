@@ -55,12 +55,17 @@ public class SoftwareRaster extends ImageRaster {
         if (x < 0 || y < 0 || x >= width || y >= height) {
             return;
         }
-       
+        
+        // 透视投影修正
+        float w = 1f / frag.position.w;
+        frag.texCoord.multLocal(w);
+        frag.color.multLocal(w);
+        frag.normal.multLocal(w);
         // 执行片段着色器
         fragmentShader(frag);
 
         int index = x + y * width;
-        float depth = frag.position.z / frag.position.w;
+        float depth = frag.position.z;
         
         // 深度测试
         if (renderState.isDepthTest()) {
@@ -163,17 +168,17 @@ public class SoftwareRaster extends ImageRaster {
      */
     public void rasterizeTriangle(RasterizationVertex v0, RasterizationVertex v1, RasterizationVertex v2) {
         
-        // 将顶点变换到投影平面
-        v0.perspectiveDivide();
-        v1.perspectiveDivide();
-        v2.perspectiveDivide();
-        
         Matrix4f viewportMatrix = renderer.getViewportMatrix();
         
         // 把顶点位置修正到屏幕空间。
         viewportMatrix.mult(v0.position, v0.position);
         viewportMatrix.mult(v1.position, v1.position);
         viewportMatrix.mult(v2.position, v2.position);
+        
+        // 将顶点变换到投影平面
+        v0.perspectiveDivide();
+        v1.perspectiveDivide();
+        v2.perspectiveDivide();
 
         switch (renderState.getFillMode()) {
         case POINT: {

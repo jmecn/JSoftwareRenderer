@@ -17,8 +17,6 @@ public class RasterizationVertex {
     public Vector3f normal = new Vector3f();    // 片段法线
     public Vector2f texCoord = new Vector2f();  // 纹理坐标
 
-    public float w;// 透视除法之前的w坐标
-    
     public boolean hasNormal = false;
     public boolean hasTexCoord = false;
     public boolean hasVertexColor = false;
@@ -30,11 +28,11 @@ public class RasterizationVertex {
      * @param t
      * @return
      */
-    public RasterizationVertex interpolateLocal(RasterizationVertex v0, RasterizationVertex v1, float t) {
+    public RasterizationVertex interpolateLocal(RasterizationVertex v0,
+            RasterizationVertex v1, float t) {
         // 顶点插值
         position.interpolateLocal(v0.position, v1.position, t);
-        w = (1 - t) * v0.w + t * v1.w;
-
+        
         // 法线插值
         if (v0.hasNormal) {
             normal.interpolateLocal(v0.normal, v1.normal, t);
@@ -53,15 +51,19 @@ public class RasterizationVertex {
         
         return this;
     }
-
+    
     /**
      * 透视除法
      */
     public void perspectiveDivide() {
-        // 保存w值，用于透视修正
-        w = position.w;
-        // 齐次坐标
-        position.multLocal(1f / w);
+        float oneOverW = 1f / position.w;
+        // 透视除法
+        position.multLocal(oneOverW);
+        texCoord.multLocal(oneOverW);
+        color.multLocal(oneOverW);
+        normal.multLocal(oneOverW);
+        // 记录1 / w
+        position.w = oneOverW;
     }
     
     /**
@@ -70,8 +72,8 @@ public class RasterizationVertex {
      * @return
      */
     public boolean isValid() {
-        return position.x > -position.w && position.x < position.w
-                && position.y > -position.w && position.y < position.w
-                && position.z > -position.w && position.z < position.w;
+        return position.x > -1 && position.x < 1
+                && position.y > -1 && position.y < 1
+                && position.z > -1 && position.z < 1;
     }
 }
