@@ -260,6 +260,23 @@ public final class Vector4f {
 
     /**
      * 向量乘法
+     * @param v
+     * @param store
+     * @return
+     */
+    public Vector4f mult(Vector4f v, Vector4f store) {
+        if (store == null)
+            store = new Vector4f();
+        store.x = x * v.x;
+        store.y = y * v.y;
+        store.z = z * v.z;
+        store.w = w * v.w;
+        return store;
+    }
+
+    
+    /**
+     * 向量乘法
      * @param vec
      * @return
      */

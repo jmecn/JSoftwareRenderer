@@ -6,6 +6,7 @@ import net.jmecn.light.Light;
 import net.jmecn.material.Material;
 import net.jmecn.material.RenderState.CullMode;
 import net.jmecn.math.ColorRGBA;
+import net.jmecn.math.Matrix3f;
 import net.jmecn.math.Matrix4f;
 import net.jmecn.math.Vector3f;
 import net.jmecn.scene.Geometry;
@@ -85,6 +86,11 @@ public class Renderer {
     private Matrix4f worldViewMatrix = new Matrix4f();
     private Matrix4f worldViewProjectionMatrix = new Matrix4f();
     
+    // 法向量变换矩阵
+    private Matrix3f normalMatrix = new Matrix3f();
+    // 摄像机位置
+    private Vector3f cameraPosition = new Vector3f();
+    
     private Matrix4f viewportMatrix = new Matrix4f();
     
     private Material material;
@@ -129,7 +135,8 @@ public class Renderer {
         viewMatrix.set(camera.getViewMatrix());
         projectionMatrix.set(camera.getProjectionMatrix());
         viewProjectionMatrix.set(camera.getViewProjectionMatrix());
-
+        cameraPosition.set(camera.getLocation());
+        
         // TODO 剔除那些不可见的物体
         
         // 遍历场景中的Mesh
@@ -140,6 +147,12 @@ public class Renderer {
             worldMatrix.set(geom.getWorldTransform().toTransformMatrix());
             viewMatrix.mult(worldMatrix, worldViewMatrix);
             viewProjectionMatrix.mult(worldMatrix, worldViewProjectionMatrix);
+            
+            // 计算法向量变换矩阵
+            worldMatrix.toRotationMatrix(normalMatrix);
+            // FIXME 先判断是否为正交矩阵，然后在决定是否要计算Invert、Transpose矩阵。
+            normalMatrix.invertLocal();
+            normalMatrix.transposeLocal();
             
             // TODO 使用包围体，剔除不可见物体
             
@@ -171,6 +184,8 @@ public class Renderer {
         shader.setWorldViewMatrix(worldViewMatrix);
         shader.setViewProjectionMatrix(viewProjectionMatrix);
         shader.setWorldViewProjectionMatrix(worldViewProjectionMatrix);
+        shader.setNormalMatrix(normalMatrix);
+        shader.setCameraPosition(cameraPosition);
         
         // 用于保存变换后的向量坐标。
         Vector3f a = new Vector3f();

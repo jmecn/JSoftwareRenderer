@@ -4,7 +4,9 @@ import java.util.List;
 
 import net.jmecn.light.Light;
 import net.jmecn.material.Material;
+import net.jmecn.math.Matrix3f;
 import net.jmecn.math.Matrix4f;
+import net.jmecn.math.Vector3f;
 import net.jmecn.scene.RasterizationVertex;
 import net.jmecn.scene.Vertex;
 
@@ -22,6 +24,9 @@ public abstract class Shader {
     protected Matrix4f viewProjectionMatrix;
     protected Matrix4f worldViewMatrix;
     protected Matrix4f worldViewProjectionMatrix;
+    
+    protected Matrix3f normalMatrix;// 法向量变换矩阵
+    protected Vector3f cameraPosition;
     
     // attributes
     protected Material material;
@@ -69,64 +74,40 @@ public abstract class Shader {
     }
     
     // getter/setters
-    public Matrix4f getWorldMatrix() {
-        return worldMatrix;
-    }
-
     public void setWorldMatrix(Matrix4f worldMatrix) {
         this.worldMatrix = worldMatrix;
-    }
-
-    public Matrix4f getViewMatrix() {
-        return viewMatrix;
     }
 
     public void setViewMatrix(Matrix4f viewMatrix) {
         this.viewMatrix = viewMatrix;
     }
 
-    public Matrix4f getProjectionMatrix() {
-        return projectionMatrix;
-    }
-
     public void setProjectionMatrix(Matrix4f projectionMatrix) {
         this.projectionMatrix = projectionMatrix;
-    }
-
-    public Matrix4f getViewProjectionMatrix() {
-        return viewProjectionMatrix;
     }
 
     public void setViewProjectionMatrix(Matrix4f viewProjectionMatrix) {
         this.viewProjectionMatrix = viewProjectionMatrix;
     }
 
-    public Matrix4f getWorldViewMatrix() {
-        return worldViewMatrix;
-    }
-
     public void setWorldViewMatrix(Matrix4f worldViewMatrix) {
         this.worldViewMatrix = worldViewMatrix;
-    }
-
-    public Matrix4f getWorldViewProjectionMatrix() {
-        return worldViewProjectionMatrix;
     }
 
     public void setWorldViewProjectionMatrix(Matrix4f worldViewProjectionMatrix) {
         this.worldViewProjectionMatrix = worldViewProjectionMatrix;
     }
 
-    public Material getMaterial() {
-        return material;
+    public void setNormalMatrix(Matrix3f normalMatrix) {
+        this.normalMatrix = normalMatrix;
+    }
+
+    public void setCameraPosition(Vector3f cameraPosition) {
+        this.cameraPosition = cameraPosition;
     }
 
     public void setMaterial(Material material) {
         this.material = material;
-    }
-
-    public List<Light> getLights() {
-        return lights;
     }
 
     public void setLights(List<Light> lights) {

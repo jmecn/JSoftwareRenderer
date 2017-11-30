@@ -15,7 +15,7 @@ public class DefaultShader extends Shader {
     @Override
     public RasterizationVertex vertexShader(Vertex vertex) {
         RasterizationVertex out = copy(vertex);
-        
+
         // 模型-观察-透视 变换
         worldViewProjectionMatrix.mult(out.position, out.position);
         
@@ -24,7 +24,7 @@ public class DefaultShader extends Shader {
 
     @Override
     public boolean fragmentShader(RasterizationVertex frag) {
-        Texture texture = material.getTexture();
+        Texture texture = material.getDiffuseMap();
         if (texture != null && frag.hasTexCoord) {
             Vector4f texColor = texture.sample2d(frag.texCoord);
             frag.color.multLocal(texColor);

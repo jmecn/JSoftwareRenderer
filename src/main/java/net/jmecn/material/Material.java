@@ -20,7 +20,7 @@ public class Material {
 
     private boolean isUseVertexColor;   // 是否使用顶点色
     
-    private Vector4f emssive;           // 自发光色
+    private Vector4f emissive;          // 自发光色
     private Vector4f diffuse;           // 漫反射光色
     private Vector4f ambient;           // 环境光色
     private Vector4f specular;          // 高光颜色
@@ -38,7 +38,7 @@ public class Material {
         
         // 初始化材质参数
         isUseVertexColor = false;   // 不使用顶点色
-        emssive = new Vector4f(0);  // 黑色
+        emissive = new Vector4f(0);  // 黑色
         diffuse = new Vector4f(1);  // 白色
         ambient = new Vector4f(1);  // 白色
         specular = new Vector4f(0); // 黑色
@@ -81,12 +81,12 @@ public class Material {
         this.isUseVertexColor = isUseVertexColor;
     }
 
-    public Vector4f getEmssive() {
-        return emssive;
+    public Vector4f getEmissive() {
+        return emissive;
     }
 
-    public void setEmssive(Vector4f emssive) {
-        this.emssive.set(emssive);
+    public void setEmissive(Vector4f emissive) {
+        this.emissive.set(emissive);
     }
 
     public Vector4f getDiffuse() {
