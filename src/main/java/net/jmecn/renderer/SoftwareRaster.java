@@ -74,12 +74,12 @@ public class SoftwareRaster extends ImageRaster {
                 return;
         }
 
-        // 混色
+        // 颜色混合
         Vector4f srcColor = frag.color;
         Vector4f destColor = getColor(x, y);
         
         switch (renderState.getBlendMode()) {
-        case OPACITY:
+        case OFF:
             destColor.x = srcColor.x;
             destColor.y = srcColor.y;
             destColor.z = srcColor.z;

@@ -45,7 +45,7 @@ public class RenderState {
      * 混色模式
      */
     public enum BlendMode {
-        OPACITY,    // 实心
+        OFF,        // 实心
         ADD,        // 叠加
         ALPHA_BLEND // ALPHA混合
     }
@@ -74,7 +74,7 @@ public class RenderState {
         isDepthTest = true;
         isDepthWrite = true;
         
-        blendMode = BlendMode.OPACITY;
+        blendMode = BlendMode.OFF;
     }
 
     public FillMode getFillMode() {
