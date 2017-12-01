@@ -1,6 +1,6 @@
-# 基于 Java 的软件光栅化渲染器
+## 基于 Java 的软件光栅化渲染器
 
-## 缘起
+### 参考
 
 [如何开始用 C++ 写一个光栅化渲染器？ - Milo Yip的回答 - 知乎](https://www.zhihu.com/question/24786878/answer/29039253)
 
@@ -27,7 +27,7 @@
 7. 通过顶点法线插值，实现Phong shading。
 8. 实现其他贴图技术，如mipmapping（也可试 Summed area table）、bilinear/trilinear filtering、bumpmapping、normal mapping、environment mapping等。
 
-## 我做了什么
+### 实现
 
 创建一个JFrame窗口
  
@@ -103,4 +103,31 @@ Alpha测试
 
 ![](http://blog.jmecn.net/content/images/2017/12/blinn_phong_shader.png)
 
-看心情继续..
+..
+
+### 相关文章
+
+1. [Java软光栅渲染器-创建窗口](http://blog.jmecn.net/java-software-renderer-1-create-project/)
+2. [Java软光栅渲染器-光栅化2D点](http://blog.jmecn.net/java-software-renderer-2-2d-point/)
+3. [Java软光栅渲染器-光栅化2D直线](http://blog.jmecn.net/java-software-renderer-3-2d-line/)
+4. [Java软光栅渲染器-2D直线剪切](http://blog.jmecn.net/java-software-renderer-4-2d-line-clipping/)
+5. [Java软光栅渲染器-光栅化2D三角形](http://blog.jmecn.net/java-software-renderer-5-2d-triangles/)
+6. [Java软光栅渲染器-3D数学库](http://blog.jmecn.net/java-software-renderer-6-3d-math/)
+7. [Java软光栅渲染器-三维向量](http://blog.jmecn.net/java-software-renderer-7-vector3f/)
+8. [Java软光栅渲染器-四元数](http://blog.jmecn.net/java-software-renderer-8-quaternion/)
+9. [Java软光栅渲染器-矩阵](http://blog.jmecn.net/java-software-renderer-9-matrix/)
+10. [ Java软光栅渲染器-空间变换](http://blog.jmecn.net/java-software-renderer-10-transform/)
+11. [Java软光栅渲染器-网格数据结构](http://blog.jmecn.net/java-software-renderer-11-mesh-data-structure/)
+12. [Java软光栅渲染器-三维观察](http://blog.jmecn.net/java-software-renderer-12-3d-view/)
+13. [Java软光栅渲染器-摄像机控制器](http://blog.jmecn.net/java-software-renderer-13-camera-controller/)
+14. [Java软光栅渲染器-背面消隐](http://blog.jmecn.net/java-software-renderer-14-cull-back-face/)
+15. [Java软光栅渲染器-3D图形渲染管线](http://blog.jmecn.net/java-software-renderer-15-3d-graphics-pipeline/)
+16. [Java软光栅渲染器-光栅化3D三角形](http://blog.jmecn.net/java-software-renderer-16-3d-triangles/)
+17. [ Java软光栅渲染器-渲染状态](http://blog.jmecn.net/java-software-renderer-17-render-state/)
+18. [Java软光栅渲染器-深度缓冲](http://blog.jmecn.net/java-software-renderer-18-depth-buffer/)
+19. [Java软光栅渲染器-纹理](http://blog.jmecn.net/java-software-renderer-19-texture-sample/)
+20. [Java软光栅渲染器-透明度](http://blog.jmecn.net/java-software-renderer-20-transparency/)
+21. [Java软光栅渲染器-透视校正插值](http://blog.jmecn.net/java-software-renderer-21-perspective-correct-interpolation/)
+22. [Java软光栅渲染器-光照、材质与着色器](http://blog.jmecn.net/java-software-renderer-22-light-material-and-shader/)
+23. [Java软光栅渲染器-顶点光照](http://blog.jmecn.net/java-software-renderer-23-vertex-lighting/)
+24. [ Java软光栅渲染器-渲染个球](http://blog.jmecn.net/java-software-renderer-24-sphere-and-phong-shader/)
