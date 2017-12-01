@@ -217,7 +217,21 @@ public class Vector3f {
     public Vector3f mult(float scalor) {
         return new Vector3f(x * scalor, y * scalor, z * scalor);
     }
-
+    
+    /**
+     * 标量乘法
+     * 
+     * @param scalor
+     * @return
+     */
+    public Vector3f mult(float scalor, Vector3f store) {
+        if (store == null) {
+            store = new Vector3f();
+        }
+        store.set(x * scalor, y * scalor, z * scalor);
+        return store;
+    }
+    
     /**
      * 标量乘法
      * 

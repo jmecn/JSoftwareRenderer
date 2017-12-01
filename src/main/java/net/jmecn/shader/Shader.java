@@ -57,17 +57,14 @@ public abstract class Shader {
         // 顶点法线
         if (vertex.normal != null) {
             out.normal.set(vertex.normal);
-            out.hasNormal = true;
         }
         // 纹理坐标
         if (vertex.texCoord != null) {
             out.texCoord.set(vertex.texCoord);
-            out.hasTexCoord = true;
         }
         // 顶点颜色
         if (vertex.color != null) {
             out.color.set(vertex.color);
-            out.hasVertexColor = true;
         }
         
         return out;

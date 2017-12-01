@@ -14,7 +14,7 @@ import net.jmecn.scene.Vertex;
  * @author yanmaoyuan
  *
  */
-public class GouraudShader extends Shader {
+public class PhongShader extends Shader {
 
     /// 下列向量，均处于世界空间中
     /// 将它们定义为类的成员，避免在光照计算时总是实例化新的对象。
@@ -39,12 +39,13 @@ public class GouraudShader extends Shader {
     
     /**
      * 计算光照
-     * @param vert
+     * @param frag
      * @param light
      */
-    private Vector3f lighting(RasterizationVertex vert, Light light) {
+    private Vector3f lighting(RasterizationVertex frag, Light light) {
         color.set(0, 0, 0);
 
+        
         if (light instanceof AmbientLight) {
             // 环境光
             material.getAmbient().mult(light.getColor(), ambient);
@@ -54,9 +55,10 @@ public class GouraudShader extends Shader {
             DirectionalLight dl = (DirectionalLight) light;
             
             // 顶点位置
-            position.set(vert.position.x, vert.position.y, vert.position.z);
+            position.set(frag.worldSpacePosition);
+            
             // 顶点法线
-            normal.set(vert.normal);
+            normal.set(frag.normal);
             
             // 计算顶点到光源的方向向量
             lightVector.set(dl.getDirection());
@@ -103,28 +105,26 @@ public class GouraudShader extends Shader {
         normalMatrix.mult(out.normal, out.normal);
         out.normal.normalizeLocal();
 
-        // 顶点位置
-        worldMatrix.mult(out.position, out.position);
-        
-        out.color.set(0, 0, 0, 1);
-        
-        // 计算光照
-        for(int i=0; i < lights.size(); i++) {
-            Light l = lights.get(i);
-            Vector3f color = lighting(out, l);
-            out.color.x += color.x;
-            out.color.y += color.y;
-            out.color.z += color.z;
-        }
-        
+        worldMatrix.mult(vertex.position, out.worldSpacePosition);
         // 模型-观察-透视 变换
-        viewProjectionMatrix.mult(out.position, out.position);
+        worldViewProjectionMatrix.mult(out.position, out.position);
         
         return out;
     }
 
     @Override
     public boolean fragmentShader(RasterizationVertex frag) {
+        
+        frag.color.set(0, 0, 0, 1);
+        // 计算光照
+        for(int i=0; i < lights.size(); i++) {
+            Light l = lights.get(i);
+            Vector3f color = lighting(frag, l);
+            frag.color.x += color.x;
+            frag.color.y += color.y;
+            frag.color.z += color.z;
+        }
+        
         Texture texture = material.getDiffuseMap();
         if (texture != null) {
             Vector4f texColor = texture.sample2d(frag.texCoord);

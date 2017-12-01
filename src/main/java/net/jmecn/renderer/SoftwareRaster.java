@@ -69,6 +69,8 @@ public class SoftwareRaster extends ImageRaster {
         frag.color.multLocal(w);
         frag.normal.multLocal(w);
         
+        frag.worldSpacePosition.multLocal(w);
+        
         // 执行片段着色器
         if ( !shader.fragmentShader(frag) )
             return;
@@ -355,7 +357,9 @@ public class SoftwareRaster extends ImageRaster {
 
         int fastStep = Math.abs(w);
         int slowStep = Math.abs(h);
+        boolean ylerp = false;
         if (fastStep <= slowStep) {
+            ylerp = true;
             fastStep = Math.abs(h);
             slowStep = Math.abs(w);
 
@@ -366,7 +370,12 @@ public class SoftwareRaster extends ImageRaster {
 
         for (int i = 0; i <= fastStep; i++) {
             // 线性插值
-            float t = (y - v0.position.y) / (v1.position.y - v0.position.y);
+            float t = 0;
+            if (ylerp)
+                t= (y - v0.position.y) / (v1.position.y - v0.position.y);
+            else
+                t = (x - v0.position.x) / (v1.position.x - v0.position.x);
+            
             RasterizationVertex frag = new RasterizationVertex();
             frag.interpolateLocal(v0, v1, t);
             rasterizePixel(x, y, frag);
@@ -382,9 +391,10 @@ public class SoftwareRaster extends ImageRaster {
             }
             
             // 线性插值
-            t = (y - v0.position.y) / (v1.position.y - v0.position.y);
-            frag = new RasterizationVertex();
-            frag.interpolateLocal(v0, v1, t);
+            if (ylerp)
+                t= (y - v0.position.y) / (v1.position.y - v0.position.y);
+            else
+                t = (x - v0.position.x) / (v1.position.x - v0.position.x);
             
             rasterizePixel(x, y, frag);
         }

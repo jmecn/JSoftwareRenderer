@@ -4,26 +4,28 @@ import net.jmecn.Application;
 import net.jmecn.light.AmbientLight;
 import net.jmecn.light.DirectionalLight;
 import net.jmecn.material.Material;
+import net.jmecn.material.Texture;
 import net.jmecn.math.Quaternion;
 import net.jmecn.math.Vector3f;
 import net.jmecn.math.Vector4f;
 import net.jmecn.renderer.Camera;
+import net.jmecn.renderer.Image;
 import net.jmecn.scene.Geometry;
 import net.jmecn.scene.Mesh;
 import net.jmecn.scene.shape.Sphere;
-import net.jmecn.shader.GouraudShader;
+import net.jmecn.shader.UnshadedShader;
 
 /**
  * 测试Gouraud Shader
  * @author yanmaoyuan
  *
  */
-public class TestGouraudShader extends Application {
+public class TestSphere extends Application {
 
     public static void main(String[] args) {
-        TestGouraudShader app = new TestGouraudShader();
+        TestSphere app = new TestSphere();
         app.setResolution(400, 300);
-        app.setTitle("Test Gouraud Shader");
+        app.setTitle("Test Sphere");
         app.setFrameRate(60);
         app.start();
     }
@@ -51,23 +53,26 @@ public class TestGouraudShader extends Application {
      */
     private void setupScene() {
         // 创建网格
-        Mesh mesh = new Sphere(1f, 32, 32);
+        Mesh mesh = new Sphere(2f, 36, 32);
         
         // 创建材质
         Material material = new Material();
         
         // 设置颜色
-        material.setDiffuse(new Vector4f(1, 0, 0, 1));
-        material.setAmbient(new Vector4f(1, 0, 0, 1));
-        material.setSpecular(new Vector4f(1, 1, 1, 1));
-        material.setShininess(16);
+        material.setDiffuse(new Vector4f(1, 1, 1, 1));
+        
+        try {
+            material.setDiffuseMap(new Texture(new Image("res/earth.jpg")));
+        } catch (Exception e){
+            material.setDiffuseMap(new Texture());
+        }
         
         // 添加到场景中
         geometry = new Geometry(mesh, material);
         rootNode.attachChild(geometry);
         
         // 设置着色器
-        material.setShader(new GouraudShader());
+        material.setShader(new UnshadedShader());
     }
     
     /**
@@ -89,7 +94,7 @@ public class TestGouraudShader extends Application {
     
     @Override
     protected void update(float delta) {
-        rot.rotateY(delta * 0.3f);
+        rot.rotateY(delta);
         geometry.getLocalTransform().getRotation().multLocal(rot);
     }
 }

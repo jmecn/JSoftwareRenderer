@@ -16,10 +16,9 @@ public class RasterizationVertex {
     public Vector4f color = new Vector4f(1);    // 片段颜色
     public Vector3f normal = new Vector3f();    // 片段法线
     public Vector2f texCoord = new Vector2f();  // 纹理坐标
-
-    public boolean hasNormal = false;
-    public boolean hasTexCoord = false;
-    public boolean hasVertexColor = false;
+    
+    // 顶点在世界空间中的模型坐标
+    public Vector3f worldSpacePosition = new Vector3f();
     
     /**
      * 插值
@@ -32,23 +31,14 @@ public class RasterizationVertex {
             RasterizationVertex v1, float t) {
         // 顶点插值
         position.interpolateLocal(v0.position, v1.position, t);
-        
         // 法线插值
-        if (v0.hasNormal) {
-            normal.interpolateLocal(v0.normal, v1.normal, t);
-            this.hasNormal = v0.hasNormal;
-        }
+        normal.interpolateLocal(v0.normal, v1.normal, t);
         // 颜色插值
-        if (v0.hasVertexColor) {
-            color.interpolateLocal(v0.color, v1.color, t);
-            this.hasVertexColor = v0.hasVertexColor;
-        }
+        color.interpolateLocal(v0.color, v1.color, t);
         // 纹理插值
-        if (v0.hasTexCoord) {
-            texCoord.interpolateLocal(v0.texCoord, v1.texCoord, t);
-            this.hasTexCoord = v0.hasTexCoord;
-        }
-        
+        texCoord.interpolateLocal(v0.texCoord, v1.texCoord, t);
+
+        worldSpacePosition.interpolateLocal(v0.worldSpacePosition, v1.worldSpacePosition, t);
         return this;
     }
     
@@ -64,6 +54,8 @@ public class RasterizationVertex {
         normal.multLocal(oneOverW);
         // 记录1 / w
         position.w = oneOverW;
+        
+        worldSpacePosition.multLocal(oneOverW);
     }
     
     /**

@@ -31,7 +31,7 @@ public class UnshadedShader extends Shader {
     @Override
     public boolean fragmentShader(RasterizationVertex frag) {
         Texture texture = material.getDiffuseMap();
-        if (texture != null && frag.hasTexCoord) {
+        if (texture != null) {
             Vector4f texColor = texture.sample2d(frag.texCoord);
             frag.color.multLocal(texColor);
         }

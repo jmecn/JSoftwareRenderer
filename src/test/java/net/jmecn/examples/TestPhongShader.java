@@ -11,19 +11,19 @@ import net.jmecn.renderer.Camera;
 import net.jmecn.scene.Geometry;
 import net.jmecn.scene.Mesh;
 import net.jmecn.scene.shape.Sphere;
-import net.jmecn.shader.GouraudShader;
+import net.jmecn.shader.PhongShader;
 
 /**
- * 测试Gouraud Shader
+ * 测试Phong Shader
  * @author yanmaoyuan
  *
  */
-public class TestGouraudShader extends Application {
+public class TestPhongShader extends Application {
 
     public static void main(String[] args) {
-        TestGouraudShader app = new TestGouraudShader();
+        TestPhongShader app = new TestPhongShader();
         app.setResolution(400, 300);
-        app.setTitle("Test Gouraud Shader");
+        app.setTitle("Test Phong Shader");
         app.setFrameRate(60);
         app.start();
     }
@@ -67,7 +67,7 @@ public class TestGouraudShader extends Application {
         rootNode.attachChild(geometry);
         
         // 设置着色器
-        material.setShader(new GouraudShader());
+        material.setShader(new PhongShader());
     }
     
     /**
