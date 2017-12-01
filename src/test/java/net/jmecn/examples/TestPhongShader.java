@@ -11,10 +11,10 @@ import net.jmecn.renderer.Camera;
 import net.jmecn.scene.Geometry;
 import net.jmecn.scene.Mesh;
 import net.jmecn.scene.shape.Sphere;
-import net.jmecn.shader.PhongShader;
+import net.jmecn.shader.BlinnPhongShader;
 
 /**
- * 测试Phong Shader
+ * 测试Blinn-Phong Shader
  * @author yanmaoyuan
  *
  */
@@ -23,7 +23,7 @@ public class TestPhongShader extends Application {
     public static void main(String[] args) {
         TestPhongShader app = new TestPhongShader();
         app.setResolution(400, 300);
-        app.setTitle("Test Phong Shader");
+        app.setTitle("Test Blinn-Phong Shader");
         app.setFrameRate(60);
         app.start();
     }
@@ -67,7 +67,7 @@ public class TestPhongShader extends Application {
         rootNode.attachChild(geometry);
         
         // 设置着色器
-        material.setShader(new PhongShader());
+        material.setShader(new BlinnPhongShader());
     }
     
     /**

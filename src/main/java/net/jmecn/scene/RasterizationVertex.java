@@ -64,8 +64,9 @@ public class RasterizationVertex {
      * @return
      */
     public boolean isValid() {
-        return position.x > -1 && position.x < 1
-                && position.y > -1 && position.y < 1
-                && position.z > -1 && position.z < 1;
+        float w = Math.abs(position.w);
+        return position.x > -w && position.x < w
+                && position.y > -w && position.y < w
+                && position.z > -w && position.z < w;
     }
 }

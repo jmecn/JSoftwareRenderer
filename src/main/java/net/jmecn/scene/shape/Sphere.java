@@ -12,17 +12,20 @@ import net.jmecn.scene.Vertex;
  */
 public class Sphere extends Mesh {
 
-    private final static float TWO_PI = (float)(2.0 * Math.PI);
     private final static float HALF_PI = (float)(0.5 * Math.PI);
+    private final static float TWO_PI = (float)(2.0 * Math.PI);
     
-    private float radius; // 半径
-    private int lonCount; // 经线数量 longitude
-    private int latCount; // 纬线数量 latitude
-    
-    private int vertCount;
-    private int triCount;
+    // 半径
+    private float radius;
+    // 经线数量 longitude
+    private int lonCount;
+    // 纬线数量 latitude
+    private int latCount;
     // 法线方向是否朝内？
     private boolean interior = false;
+    
+    private int vertCount;// 顶点数量
+    private int triCount; // 三角形数量
     
     public Sphere() {
         this(1f);
@@ -33,11 +36,17 @@ public class Sphere extends Mesh {
     }
     
     public Sphere(float radius, int lonCount, int latCount) {
+        this(radius, lonCount, latCount, false);
+    }
+    
+    public Sphere(float radius, int lonCount, int latCount, boolean interior) {
         this.radius = radius;
         this.lonCount = lonCount;
         this.latCount =latCount;
+        this.interior = interior;
+        
         createVertexBuffer();
-        setIndexData();
+        createIndexBuffer();
     }
     
     /**
@@ -62,7 +71,7 @@ public class Sphere extends Mesh {
         sin[lonCount] = sin[0];
         cos[lonCount] = cos[0];
         
-        // generate the sphere itself
+        // 生成Sphere顶点数据
         Vertex v;
         float factor = 2.0f / (latCount - 1);
         int i = 0;
@@ -75,7 +84,7 @@ public class Sphere extends Mesh {
             float sliceHeight = (float) sinZ * radius;
             float sliceRadius = (float) Math.cos(fAFraction) * radius;
 
-            // compute slice vertices with duplication at end point
+            // 计算圆截面上的顶点坐标，首位两个顶点共用相同的位置和法线。
             int iSave = i;
             for (int iR = 0; iR < lonCount; iR++) {
                 v = vertexes[i] = new Vertex();
@@ -117,20 +126,19 @@ public class Sphere extends Mesh {
     }
     
     /**
-     * sets the indices for rendering the sphere.
+     * 计算顶点索引
      */
-    private void setIndexData() {
-        // allocate connectivity
+    private void createIndexBuffer() {
         this.triCount = 2 * (latCount - 2) * lonCount;
         this.indexes = new int[3 * triCount];
 
-        // generate connectivity
+        // 生成三角形
         int index = 0;
-        for (int iZ = 0, iZStart = 0; iZ < (latCount - 3); iZ++) {
-            int i0 = iZStart;
+        for (int y = 0, yStart = 0; y < (latCount - 3); y++) {
+            int i0 = yStart;
             int i1 = i0 + 1;
-            iZStart += (lonCount + 1);
-            int i2 = iZStart;
+            yStart += (lonCount + 1);
+            int i2 = yStart;
             int i3 = i2 + 1;
             for (int i = 0; i < lonCount; i++, index += 6) {
                 if (!interior) {
@@ -140,7 +148,7 @@ public class Sphere extends Mesh {
                     indexes[index+3] = i1++;
                     indexes[index+4] = i2++;
                     indexes[index+5] = i3++;
-                } else { // inside view
+                } else { // 内部
                     indexes[index] = i0++;
                     indexes[index+1] = i1;
                     indexes[index+2] = i2;
@@ -157,7 +165,7 @@ public class Sphere extends Mesh {
                 indexes[index] = i;
                 indexes[index+1] = i + 1;
                 indexes[index+2] = vertCount - 2;
-            } else { // inside view
+            } else { // 内部
                 indexes[index] = i;
                 indexes[index+1] = vertCount - 2;
                 indexes[index+2] = i + 1;
@@ -171,7 +179,7 @@ public class Sphere extends Mesh {
                 indexes[index] = i + iOffset;
                 indexes[index+1] = vertCount - 1;
                 indexes[index+2] = i + 1 + iOffset;
-            } else { // inside view
+            } else { // 内部
                 indexes[index] = i + iOffset;
                 indexes[index+1] = i + 1 + iOffset;
                 indexes[index+2] = vertCount - 1;

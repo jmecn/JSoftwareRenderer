@@ -10,11 +10,11 @@ import net.jmecn.scene.RasterizationVertex;
 import net.jmecn.scene.Vertex;
 
 /**
- * Gouraud着色器
+ * Blinn-Phong着色器
  * @author yanmaoyuan
  *
  */
-public class PhongShader extends Shader {
+public class BlinnPhongShader extends Shader {
 
     /// 下列向量，均处于世界空间中
     /// 将它们定义为类的成员，避免在光照计算时总是实例化新的对象。
