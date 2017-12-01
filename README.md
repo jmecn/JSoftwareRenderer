@@ -1,6 +1,6 @@
-基于 Java 的软件光栅化渲染器
+# 基于 Java 的软件光栅化渲染器
 
-==
+## 缘起
 
 [如何开始用 C++ 写一个光栅化渲染器？ - Milo Yip的回答 - 知乎](https://www.zhihu.com/question/24786878/answer/29039253)
 
@@ -26,3 +26,81 @@
 6. 实现简单的顶点光照，使用顶点颜色插值实现Gouraud shading。
 7. 通过顶点法线插值，实现Phong shading。
 8. 实现其他贴图技术，如mipmapping（也可试 Summed area table）、bilinear/trilinear filtering、bumpmapping、normal mapping、environment mapping等。
+
+## 我做了什么
+
+创建一个JFrame窗口
+ 
+![](http://blog.jmecn.net/content/images/2017/11/soft-renderer-01.png)
+
+光栅化2d点
+
+![](http://blog.jmecn.net/content/images/2017/11/soft-renderer-08.png)
+
+光栅化2d线段
+
+![](http://blog.jmecn.net/content/images/2017/11/soft-renderer-09.png)
+
+2D直线裁剪
+
+![](http://blog.jmecn.net/content/images/2017/11/soft-renderer-10.png)
+
+光栅化2D三角形
+
+![](http://blog.jmecn.net/content/images/2017/11/soft-renderer-11.png)
+
+创建3D数学库，实现3D空间变换。
+
+![](http://blog.jmecn.net/content/images/2017/11/Test3DWorldMatrix.gif)
+
+创建虚拟摄像机，实现3D观察。
+
+![](http://blog.jmecn.net/content/images/2017/11/3d_cube.gif)
+
+接收用户输入，实现第一人称摄像机控制器。
+
+![](http://blog.jmecn.net/content/images/2017/11/camera_controller.gif)
+
+背面剔除
+
+![](http://blog.jmecn.net/content/images/2017/11/3dview.gif)
+
+3D光栅化
+
+![](http://blog.jmecn.net/content/images/2017/11/3d_opacity_cube.png)
+
+深度缓冲
+
+![](http://blog.jmecn.net/content/images/2017/11/depthTest_2.png)
+
+纹理采样。实现纹理包裹（WarpMode），以及最邻近点（Nearest）和二次线性（Bilinear）滤波。
+
+![](http://blog.jmecn.net/content/images/2017/11/test_warp_mode.png)
+
+Alpha测试
+
+![](http://blog.jmecn.net/content/images/2017/11/alpha_falloff_4.png)
+
+颜色混合
+
+![](http://blog.jmecn.net/content/images/2017/11/test_blend_mode.png)
+
+透视校正插值
+
+![](http://blog.jmecn.net/content/images/2017/11/persp_correct_lerp_3.png)
+
+实现了材质和着色器框架。
+
+![](http://blog.jmecn.net/content/images/2017/12/test_sphere_1.png)
+
+![](http://blog.jmecn.net/content/images/2017/11/unshaded_shader.png)
+
+基于Gouraud Shader的顶点光照
+
+![](http://blog.jmecn.net/content/images/2017/12/vertex_light_2.gif)
+
+实现了Blinn-Phong Shader
+
+![](http://blog.jmecn.net/content/images/2017/12/blinn_phong_shader.png)
+
+看心情继续..
