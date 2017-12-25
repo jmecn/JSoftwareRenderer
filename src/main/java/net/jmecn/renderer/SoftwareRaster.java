@@ -171,13 +171,22 @@ public class SoftwareRaster extends ImageRaster {
         return color;
     }
 
+    // 为了避免通过引用改变顶点的原始值，这里复制一份顶点数据，用于实际计算。
+    private RasterizationVertex v0 = new RasterizationVertex();
+    private RasterizationVertex v1 = new RasterizationVertex();
+    private RasterizationVertex v2 = new RasterizationVertex();
+    
     /**
      * 光栅化三角形
-     * @param v0
-     * @param v1
-     * @param v2
+     * @param a
+     * @param b
+     * @param c
      */
-    public void rasterizeTriangle(RasterizationVertex v0, RasterizationVertex v1, RasterizationVertex v2) {
+    public void rasterizeTriangle(final RasterizationVertex a, final RasterizationVertex b, final RasterizationVertex c) {
+        // 为了避免通过引用改变顶点的原始值，这里复制一份顶点数据，用于实际计算。
+        v0.copy(a);
+        v1.copy(b);
+        v2.copy(c);
         
         Matrix4f viewportMatrix = renderer.getViewportMatrix();
         

@@ -1,5 +1,7 @@
 package net.jmecn.renderer;
 
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import net.jmecn.light.Light;
@@ -187,39 +189,70 @@ public class Renderer {
         shader.setNormalMatrix(normalMatrix);
         shader.setCameraPosition(cameraPosition);
         
-        // 用于保存变换后的向量坐标。
-        Vector3f a = new Vector3f();
-        Vector3f b = new Vector3f();
-        Vector3f c = new Vector3f();
-        
         // 提取网格数据
         Mesh mesh = geometry.getMesh();
         int[] indexes = mesh.getIndexes();
         Vertex[] vertexes = mesh.getVertexes();
         
+        // 执行顶点着色器
+        RasterizationVertex[] verts = new RasterizationVertex[vertexes.length];
+        for(int i = 0; i<vertexes.length; i++) {
+            verts[i] = shader.vertexShader(vertexes[i]);
+        }
+        
+        // 临时变量
+        // 用于保存变换后的向量坐标。
+        Vector3f v0 = new Vector3f();
+        Vector3f v1 = new Vector3f();
+        Vector3f v2 = new Vector3f();
+        // 用于光栅化
+        RasterizationVertex out0 = new RasterizationVertex();
+        RasterizationVertex out1 = new RasterizationVertex();
+        RasterizationVertex out2 = new RasterizationVertex();
+        
         // 遍历所有三角形
         for (int i = 0; i < indexes.length; i += 3) {
 
-            Vertex v0 = vertexes[indexes[i]];
-            Vertex v1 = vertexes[indexes[i+1]];
-            Vertex v2 = vertexes[indexes[i+2]];
-            
-            // 执行顶点着色器
-            RasterizationVertex out0 = shader.vertexShader(v0);
-            RasterizationVertex out1 = shader.vertexShader(v1);
-            RasterizationVertex out2 = shader.vertexShader(v2);
+            int idx0 = indexes[i];
+            int idx1 = indexes[i + 1];
+            int idx2 = indexes[i + 2];
             
             // 在观察空间进行背面消隐
-            worldViewMatrix.mult(v0.position, a);
-            worldViewMatrix.mult(v1.position, b);
-            worldViewMatrix.mult(v2.position, c);
+            worldViewMatrix.mult(vertexes[idx0].position, v0);
+            worldViewMatrix.mult(vertexes[idx1].position, v1);
+            worldViewMatrix.mult(vertexes[idx2].position, v2);
             
-            if (cullBackFace(a, b, c))
+            if (cullBackFace(v0, v1, v2))
                 continue;
 
-            // TODO 视锥裁剪
+            // 准备执行光栅化
+            // 为了避免在光栅化阶段
+            out0.copy(verts[idx0]);
+            out1.copy(verts[idx1]);
+            out2.copy(verts[idx2]);
             
-            raster.rasterizeTriangle(out0, out1, out2);
+            // 视锥体裁剪
+            if (out0.isValid() && out1.isValid() && out2.isValid()) {
+                raster.rasterizeTriangle(out0, out1, out2);
+            } else {
+                
+                List<RasterizationVertex> vertices = new ArrayList<>();
+                List<RasterizationVertex> auxillaryList = new ArrayList<>();
+                
+                vertices.add(out0);
+                vertices.add(out1);
+                vertices.add(out2);
+                
+                if (clipPolygonAxis(vertices, auxillaryList, 0) &&
+                        clipPolygonAxis(vertices, auxillaryList, 1) &&
+                        clipPolygonAxis(vertices, auxillaryList, 2)) {
+                    
+                    RasterizationVertex initialVertex = vertices.get(0);
+                    for(int j = 1; j < vertices.size() - 1; j++) {
+                        raster.rasterizeTriangle(initialVertex, vertices.get(j), vertices.get(j+1));
+                    }
+                }
+            }
         }
     }
     
@@ -258,6 +291,63 @@ public class Renderer {
             return false;
         }
     }
+    
+    /**
+     * 使用Sutherland-Hodgman算法，进行多边形裁剪。将三角形的各边与视锥平面进行相交，计算交点。
+     * @param vertices
+     * @param auxillaryList
+     * @param componentIndex
+     * @return
+     */
+    private boolean clipPolygonAxis(List<RasterizationVertex> vertices, List<RasterizationVertex> auxillaryList,
+            int componentIndex) {
+        // 右边
+        clipPolygonComponent(vertices, componentIndex, 1.0f, auxillaryList);
+        vertices.clear();
+
+        if(auxillaryList.isEmpty()) {
+            return false;
+        }
+
+        // 左边
+        clipPolygonComponent(auxillaryList, componentIndex, -1.0f, vertices);
+        auxillaryList.clear();
+
+        return !vertices.isEmpty();
+    }
+    
+    private void clipPolygonComponent(List<RasterizationVertex> vertices, int componentIndex, 
+            float componentFactor, List<RasterizationVertex> result) {
+        RasterizationVertex previousVertex = vertices.get(vertices.size() - 1);
+        
+        float previousComponent = previousVertex.position.get(componentIndex) * componentFactor;
+        boolean previousInside = previousComponent <= previousVertex.position.w;
+
+        Iterator<RasterizationVertex> it = vertices.iterator();
+        while(it.hasNext()) {
+            RasterizationVertex currentVertex = it.next();
+            float currentComponent = currentVertex.position.get(componentIndex) * componentFactor;
+            boolean currentInside = currentComponent <= currentVertex.position.w;
+
+            if(currentInside ^ previousInside) {
+                float lerpAmt = (previousVertex.position.w - previousComponent) /
+                    ((previousVertex.position.w - previousComponent) - 
+                     (currentVertex.position.w - currentComponent));
+
+                RasterizationVertex v = new RasterizationVertex();
+                v.interpolateLocal(previousVertex, currentVertex, lerpAmt);
+                result.add(v);
+            }
+
+            if(currentInside) {
+                result.add(currentVertex);
+            }
+
+            previousVertex = currentVertex;
+            previousComponent = currentComponent;
+            previousInside = currentInside;
+        }
+}
     
     public Matrix4f getViewportMatrix() {
         return viewportMatrix;

@@ -21,6 +21,18 @@ public class RasterizationVertex {
     public Vector3f worldSpacePosition = new Vector3f();
     
     /**
+     * 复制另一个顶点的数据
+     * @param v
+     */
+    public void copy(RasterizationVertex v) {
+        position.set(v.position);
+        color.set(v.color);
+        normal.set(v.normal);
+        texCoord.set(v.texCoord);
+        worldSpacePosition.set(v.worldSpacePosition);
+    }
+    
+    /**
      * 插值
      * @param 
      * @param v1

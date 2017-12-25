@@ -387,6 +387,20 @@ public final class Vector4f {
         return this;
     }
     
+    public float get(int index) {
+        switch (index) {
+        case 0:
+            return x;
+        case 1:
+            return y;
+        case 2:
+            return z;
+        case 3:
+            return w;
+        default:
+            throw new IndexOutOfBoundsException();
+        }
+    }
     // 基本的Getter和Setter
 
     public float getX() {
