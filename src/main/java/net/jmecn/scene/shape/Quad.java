@@ -53,7 +53,7 @@ public class Quad extends Mesh {
                 0, 2, 3
         };
         
-        this.vertexes = new Vertex[positions.length];
+        this.vertexes = new Vertex[positions.length / 3];
         
         for(int i = 0; i < indexes.length; i++) {
             int index = indexes[i];

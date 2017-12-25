@@ -95,7 +95,7 @@ public class Box extends Mesh {
                 20, 21, 23, 20, 23, 22,
         };
         
-        this.vertexes = new Vertex[positions.length];
+        this.vertexes = new Vertex[positions.length / 3];
         
         for(int i = 0; i < indexes.length; i++) {
             int index = indexes[i];
