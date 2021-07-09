@@ -18,7 +18,7 @@ public class Test3DSceneGraph extends Application {
 
     public static void main(String[] args) {
         Test3DSceneGraph app = new Test3DSceneGraph();
-        app.setResolution(400, 300);
+        app.setResolution(1080, 720);
         app.setFrameRate(60);
         app.setTitle("Test 3D SceneGraph");
         app.start();

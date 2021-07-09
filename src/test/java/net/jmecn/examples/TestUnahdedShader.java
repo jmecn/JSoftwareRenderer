@@ -22,7 +22,7 @@ public class TestUnahdedShader extends Application {
 
     public static void main(String[] args) {
         TestUnahdedShader app = new TestUnahdedShader();
-        app.setResolution(400, 300);
+        app.setResolution(1080, 720);
         app.setTitle("Test Unshaded Shader");
         app.setFrameRate(60);
         app.start();

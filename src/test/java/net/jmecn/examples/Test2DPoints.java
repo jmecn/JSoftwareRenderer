@@ -16,7 +16,7 @@ public class Test2DPoints extends Application {
 
     public static void main(String[] args) {
         Test2DPoints app = new Test2DPoints();
-        app.setResolution(720, 405);
+        app.setResolution(1080, 720);
         app.setTitle("2D Points");
         app.setFrameRate(120);
         app.start();

@@ -15,7 +15,7 @@ public class Test3DRasterization extends Application {
 
     public static void main(String[] args) {
         Test3DRasterization app = new Test3DRasterization();
-        app.setResolution(400, 300);
+        app.setResolution(1080, 720);
         app.setTitle("Test 3D Rasterization");
         app.setFrameRate(60);
         app.start();

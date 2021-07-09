@@ -21,7 +21,7 @@ public class Test3DBlendMode extends Application {
 
     public static void main(String[] args) {
         Test3DBlendMode app = new Test3DBlendMode();
-        app.setResolution(400, 300);
+        app.setResolution(1080, 720);
         app.setTitle("Test BlendMode");
         app.setFrameRate(60);
         app.start();

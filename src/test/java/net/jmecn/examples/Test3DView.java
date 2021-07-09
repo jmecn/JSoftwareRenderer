@@ -20,7 +20,7 @@ public class Test3DView extends Application {
 
     public static void main(String[] args) {
         Test3DView app = new Test3DView();
-        app.setResolution(400, 300);
+        app.setResolution(1080, 720);
         app.setTitle("3D View");
         app.setFrameRate(60);
         app.start();

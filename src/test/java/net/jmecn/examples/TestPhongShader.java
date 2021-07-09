@@ -22,7 +22,7 @@ public class TestPhongShader extends Application {
 
     public static void main(String[] args) {
         TestPhongShader app = new TestPhongShader();
-        app.setResolution(400, 300);
+        app.setResolution(1080, 720);
         app.setTitle("Test Blinn-Phong Shader");
         app.setFrameRate(60);
         app.start();

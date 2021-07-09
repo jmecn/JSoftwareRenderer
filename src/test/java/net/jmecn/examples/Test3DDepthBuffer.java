@@ -16,7 +16,7 @@ public class Test3DDepthBuffer extends Application {
 
     public static void main(String[] args) {
         Test3DDepthBuffer app = new Test3DDepthBuffer();
-        app.setResolution(400, 300);
+        app.setResolution(1080, 720);
         app.setTitle("Test DepthBuffer");
         app.setFrameRate(60);
         app.start();

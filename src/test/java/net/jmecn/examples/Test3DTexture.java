@@ -17,7 +17,7 @@ public class Test3DTexture extends Application {
 
     public static void main(String[] args) {
         Test3DTexture app = new Test3DTexture();
-        app.setResolution(400, 300);
+        app.setResolution(1080, 720);
         app.setTitle("Test Texture");
         app.setFrameRate(60);
         app.start();

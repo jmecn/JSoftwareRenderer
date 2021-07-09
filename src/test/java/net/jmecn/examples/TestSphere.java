@@ -21,7 +21,7 @@ public class TestSphere extends Application {
 
     public static void main(String[] args) {
         TestSphere app = new TestSphere();
-        app.setResolution(400, 300);
+        app.setResolution(1080, 720);
         app.setTitle("Test Sphere");
         app.setFrameRate(60);
         app.start();

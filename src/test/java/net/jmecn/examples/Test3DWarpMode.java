@@ -23,7 +23,7 @@ public class Test3DWarpMode extends Application {
 
     public static void main(String[] args) {
         Test3DWarpMode app = new Test3DWarpMode();
-        app.setResolution(400, 300);
+        app.setResolution(1080, 720);
         app.setTitle("Test WarpMode");
         app.setFrameRate(60);
         app.start();

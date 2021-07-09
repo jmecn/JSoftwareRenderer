@@ -15,7 +15,7 @@ public class Test3DWorldMatrix extends Application {
 
     public static void main(String[] args) {
         Test3DWorldMatrix app = new Test3DWorldMatrix();
-        app.setResolution(400, 400);
+        app.setResolution(1080, 720);
         app.setTitle("3D WorldMatrix");
         app.setFrameRate(60);
         app.start();

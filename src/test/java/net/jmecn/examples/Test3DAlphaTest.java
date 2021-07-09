@@ -17,7 +17,7 @@ public class Test3DAlphaTest extends Application {
 
     public static void main(String[] args) {
         Test3DAlphaTest app = new Test3DAlphaTest();
-        app.setResolution(400, 300);
+        app.setResolution(1080, 720);
         app.setTitle("Test AlphaChannel");
         app.setFrameRate(60);
         app.start();
