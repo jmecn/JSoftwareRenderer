@@ -1,14 +1,16 @@
 /**
  * created by 'jmecn' at '17-11-20 17:35' with Gradle 3.2.1
  */
-
-apply plugin: 'java'
+plugins {
+    id 'java'
+    id 'application'
+}
 
 repositories {
-    jcenter()
+    mavenCentral()
 }
 
 dependencies {
     implementation 'org.slf4j:slf4j-api:1.7.21'
-    testImplementation 'junit:junit:4.12'
+    testImplementation 'junit:junit:4.13.2'
 }
