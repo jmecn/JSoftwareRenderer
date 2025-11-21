@@ -99,16 +99,19 @@ public class SoftwareRaster extends ImageRaster {
             destColor.x = srcColor.x;
             destColor.y = srcColor.y;
             destColor.z = srcColor.z;
+            destColor.w = srcColor.w;
             break;
         case ADD:
             destColor.x += srcColor.x;
             destColor.y += srcColor.y;
             destColor.z += srcColor.z;
+            destColor.w += srcColor.w;
             break;
         case ALPHA_BLEND:
             destColor.x = destColor.x + (srcColor.x - destColor.x) * srcColor.w;
             destColor.y = destColor.y + (srcColor.y - destColor.y) * srcColor.w;
             destColor.z = destColor.z + (srcColor.z - destColor.z) * srcColor.w;
+            destColor.w = srcColor.w + destColor.w * (1 - srcColor.w);
             break;
         }
         
